@@ -17,6 +17,7 @@
 <section class="scr" id="s-home" aria-labelledby="hTitle">
  <header class="top"><h1 id="hTitle">Buddy<em>.</em></h1><div class="streak" id="streak" aria-label="Streak">🔥 0 days</div><button class="icon" id="gear" aria-label="Settings">⚙︎</button></header>
  <div class="slot home" id="slotHome"></div>
+ <div class="buddyBar"><p id="moodCap" class="moodCap" aria-live="polite"></p><button id="xpBtn" class="xpBtn"><b id="xpLv">Level 1</b><span class="xpTrack" aria-hidden="true"><i id="xpFill"></i></span><small id="xpTxt"></small><span class="xpGo" aria-hidden="true">👕 ›</span></button></div>
  <div class="goalRow">
   <button class="ringBtn" id="ringBtn" aria-label="Daily goal progress. Tap to change goals"><svg viewBox="0 0 120 120" class="gring" aria-hidden="true"><circle cx="60" cy="60" r="50" class="rt"/><circle cx="60" cy="60" r="50" class="rp" id="ringP"/></svg>
    <span class="ringTxt"><b id="ringPct">0%</b><small>of today's goal</small></span></button>
@@ -27,6 +28,12 @@
  <p class="small" id="homeNote"></p>
 </section>
 <!-- 2. Picker -->
+<section class="scr" id="s-ward" hidden aria-labelledby="wTitle">
+ <header class="top sub"><button class="back" data-go="home" aria-label="Back to today">‹ Back</button><h2 id="wTitle">Buddy</h2><span class="pill" id="wLv"></span></header>
+ <div class="slot ward" id="slotWard"></div>
+ <h3 class="wH">Outfits</h3><div class="wGrid" id="wGrid"></div>
+ <h3 class="wH">Muscle levels</h3><p class="small">From your last ~30 days. Muscles you skip slowly shrink.</p><div id="wMus"></div>
+</section>
 <section class="scr" id="s-pick" hidden aria-labelledby="pTitle">
  <header class="top sub"><button class="back" data-go="home" aria-label="Back to today">‹ Back</button><h2 id="pTitle">Push-ups</h2></header>
  <div class="chips" id="chips" role="radiogroup" aria-label="Exercise"></div>
@@ -92,7 +99,7 @@
 
 <!-- shared Buddy parts (moved between screens) -->
 <div id="parts">
-<section class="stage" aria-label="Buddy the stick pal. Tap Buddy to turn around.">
+<section class="stage" aria-label="Buddy the stick pal. Tap Buddy for a tip.">
  <svg class="fig" id="fig" viewBox="0 0 390 300" role="img" aria-label="Buddy the cartoon stick figure, whose muscles grow as you train">
   <defs>
    <linearGradient id="mg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#EEFFB0"/><stop offset=".55" stop-color="#C9F94A"/><stop offset="1" stop-color="#8FCB1C"/></linearGradient>
@@ -107,7 +114,7 @@
   </g></g>
   <rect id="vg" width="390" height="300" fill="url(#vig)" opacity="0" pointer-events="none"/>
  </svg>
- <div id="hud" aria-hidden="true"></div><div id="combo" aria-hidden="true"></div><div id="banner" aria-hidden="true"></div>
+ <div id="hud" aria-hidden="true"></div><div id="combo" aria-hidden="true"></div><div id="banner" aria-hidden="true"></div><div id="bubble" role="status" aria-live="polite"></div><div id="mBan" class="mBan" role="status" aria-live="polite"></div>
  <div id="pv" hidden role="img" aria-label="Small mirrored camera preview with your tracked body points highlighted"><div class="mir"><video playsinline muted autoplay></video><canvas></canvas></div><span id="pvSt">…</span></div>
  <button class="turn" id="turn" aria-label="Turn Buddy around">↻ <span id="tl">Back</span></button>
 </section>

@@ -17,7 +17,7 @@ const sayV=(e,v)=>isH(e)?(v>=60?Math.floor(v/60)+' minute'+(v>=120?'s':'')+(v%60
 // muscles each exercise grows (same maps the shared engine uses for highlights); holds: 2 s ≈ 1 rep of work
 if(typeof ICONS!=='undefined')ICONS.burpees='<circle cx="6.5" cy="31" r="3"/><path d="M10.5 33.5L24 38.5M12.5 35V40.5"/><circle cx="36" cy="9" r="3.5"/><path d="M36 14V26L32 34M36 26L40 34M36 16L30 7M36 16L42 7"/><path class="fl" d="M3 41.5H45"/>';
 const SM=(e,c)=>`<svg class="sm ${c||''}" viewBox="0 0 48 48" aria-hidden="true" focusable="false" style="--c:${COL[e]}">${(typeof ICONS!=="undefined"&&ICONS[e])||''}</svg>`;
-const MUSC=e=>(window.Engine&&Engine.EXMAP&&Engine.EXMAP[e]&&Engine.EXMAP[e].m)||{};
+const MUSC=e=>(typeof Engine!=='undefined'&&Engine.EXMAP&&Engine.EXMAP[e]&&Engine.EXMAP[e].m)||{};
 const work=e=>allTot(e)/(isH(e)?2:1);
 const KEY='buddy.v1';
 const DEF=()=>({v:1,sets:[],goals:Object.fromEntries(EXS.map(e=>[e,XT[e][3]])),goalWeek:null,body:[],badges:{},bestStreak:0,
@@ -57,10 +57,6 @@ const BADGES=[['first','🎉','First set',()=>S.sets.length>=1],['c100','💯','
  ['goal','🎯','Daily goal smashed',()=>S.sets.some(s=>goalDay(dk(s.t)))],['s7','🔥','7-day streak',()=>S.bestStreak>=7],['c1000','🏅','1,000 club',()=>allTot()>=1000],['s30','👑','30-day streak',()=>S.bestStreak>=30]];
 function checkBadges(){S.bestStreak=Math.max(S.bestStreak||0,streak());const n=[];for(const [id,e,name,f] of BADGES)if(!S.badges[id]&&f()){S.badges[id]=today();n.push(e+' Badge: '+name)}if(n.length)save();return n}
 // ---------- Buddy: muscles grow with lifetime reps ----------
-function syncBuddy(){if(!window.Engine)return;const lv={};for(const [k] of Engine.MUSCLES)lv[k]=.2;
- const acc={};for(const e of EXS){const t=work(e),m=MUSC(e);for(const k in m)acc[k]=(acc[k]||0)+t*m[k]}
- for(const k in acc)if(k in lv)lv[k]=.2+.8*(1-Math.exp(-acc[k]/900));
- for(const [k] of Engine.MUSCLES){Engine.T[k]=Engine.D[k]=lv[k];Engine.P[k]=0}Engine.draw()}
 function place(slot){const st=document.querySelector('.stage');if(st.parentNode!==$(slot))$(slot).prepend(st)}
 // ---------- toast / voice / confetti ----------
 let toastT;function toast(t,ms){const e=$('toast');e.textContent=t;e.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>e.classList.remove('on'),ms||3200)}
@@ -80,7 +76,7 @@ function show(name,push=true){
  document.body.classList.toggle('nonav',!(name==='home'||name==='stats'));
  qa('.bnav button').forEach(b=>b.toggleAttribute('aria-current',b.dataset.go===name));
  if(push)try{history.pushState({s:name},'','#'+name)}catch(e){}
- ({home:renderHome,pick:renderPick,log:renderLog,stats:renderStats}[name]||(()=>{}))();
+ ({home:renderHome,ward:renderWard,pick:renderPick,log:renderLog,stats:renderStats}[name]||(()=>{}))();
  window.scrollTo(0,0)}
 addEventListener('popstate',e=>{const s=(e.state&&e.state.s)||'home';show(s==='cam'||s==='done'||s==='rest'||s==='hold'?'home':s,false)});
 document.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b&&!b.closest('dialog'))show(b.dataset.go)});
@@ -97,7 +93,7 @@ function renderHome(){place('slotHome');syncBuddy();const d=today(),st=streak();
  $('ringBtn').setAttribute('aria-label',`Today's goal ${pct}% done. Tap to change goals`);
  const left=G.filter(e=>dayTot(e,d)<S.goals[e]).map(e=>isH(e)?`${fmt(e,S.goals[e]-dayTot(e,d))} of ${EXL[e]}`:`${S.goals[e]-dayTot(e,d)} ${EXL[e]}`);
  $('homeNote').textContent=need&&pct>=100?'Goal done today — Buddy is proud of you! Extra sets still grow muscle.':st&&!activeDay(d)?`Keep your ${st}-day streak alive — even one set counts.`:pct===0&&left.length>1?'Short sets add up. One set of each is a great start.':left.length?`Just ${left.slice(0,3).join(' and ')} to go.`:'';
- $('startBtn').textContent=activeDay(d)?'Keep going':'Start workout'}
+ $('startBtn').textContent=activeDay(d)?'Keep going':'Start workout';motHome()}
 $('tiles').onclick=e=>{const b=e.target.closest('.tile');if(b){ex=b.dataset.ex;show('pick')}};
 $('startBtn').onclick=()=>{const d=today(),G=GE(),f=e=>dayTot(e,d)/S.goals[e];const L=G.filter(e=>f(e)<1).sort((a,b)=>f(a)-f(b));ex=L[0]||S.settings.lastEx||'pushups';show('pick')};
 // ---------- 2. picker ----------
@@ -129,7 +125,7 @@ document.addEventListener('buddy:camstop',e=>{if(!camActive)return;camActive=fal
  else{toast('No reps counted — tap Start camera to try again.')}});
 const todayTxt=e=>fmt(e,dayTot(e,today()))+(S.goals[e]?' / '+fmt(e,S.goals[e]):'');
 window.BuddyHooks={best:id=>best(id),autoStop:()=>S.settings.autoStop!==false};
-function logSet(e,reps,src){const prevBest=best(e),prev=lastOf(e),wasGoal=S.goals[e]>0&&dayTot(e,today())>=S.goals[e];
+function logSet(e,reps,src){justLogged=true;const prevBest=best(e),prev=lastOf(e),wasGoal=S.goals[e]>0&&dayTot(e,today())>=S.goals[e];
  const set={id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),ex:e,reps:reps,t:Date.now(),src};S.sets.push(set);save();
  return {set,prevBest,prevLast:prev?prev.reps:null,goalNow:S.goals[e]>0&&!wasGoal&&dayTot(e,today())>=S.goals[e],badges:checkBadges()}}
 function cmpText(r){const d=r.prevLast==null?null:r.set.reps-r.prevLast,h=isH(r.set.ex);
@@ -228,13 +224,16 @@ function settings(){const st=S.settings;
  <label for="uN">Body log units</label><select id="uN" name="units"><option value="kg"${st.units==='kg'?' selected':''}>kg / cm</option><option value="lb"${st.units==='lb'?' selected':''}>lb / inches</option></select>
  <div class="row"><button class="btn" value="">Cancel</button><button class="btn pri" value="ok">Save</button></div>
  <details class="hint"><summary>About reminders</summary>Phones only let web apps show a reminder while Buddy is open or, on Android with the app installed, occasionally in the background. iPhone web apps can’t schedule local reminders — use the Clock or Reminders app for a dependable nudge.</details>
- <div class="row"><button class="btn" value="export">Export my data</button><button class="btn danger" value="erase">Erase all data</button></div>`,(v,f)=>{
+ <div class="row"><button class="btn" value="export">Export my data</button><button class="btn" value="import">Import data</button><button class="btn danger" value="erase">Erase all data</button></div>`,(v,f)=>{
   if(v==='ok'){for(const e of EXS){const g=Math.round(+f['g_'+e].value);if(g>=0)S.goals[e]=Math.min(isH(e)?3600:1000,g)}if(!GE().length)S.goals.pushups=50;st.autoStop=f.auto.value==='1';st.rest=+f.rest.value;st.units=f.units.value;
    const had=st.remind;st.remind=f.rem.value||'';save();if(st.remind&&st.remind!==had)setupRemind(true);renderHome();toast('Saved')}
   else if(v==='export')exportJSON();
+  else if(v==='import')importJSON();
   else if(v==='erase'){if(confirm('Erase every set, goal and body-log entry on this device? This cannot be undone.')){S=DEF();save();renderHome();toast('All data erased')}}})}
 $('gear').onclick=settings;$('ringBtn').onclick=settings;
 function download(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
+function importJSON(){const i=document.createElement('input');i.type='file';i.accept='application/json,.json';i.onchange=async()=>{try{const o=JSON.parse(await i.files[0].text());if(!o||o.v!==1||!Array.isArray(o.sets))throw 0;
+ if(!confirm('Replace the data on this device with this file ('+o.sets.length+' sets)?'))return;localStorage.setItem(KEY,JSON.stringify(o));S=load();save();renderHome();toast('Data imported')}catch(e){toast('That file is not a Buddy export')}};i.click()}
 function exportJSON(){download('buddy-data-'+today()+'.json',JSON.stringify(S,null,1),'application/json')}
 // ---------- reminders (best effort) ----------
 let remT=0;
@@ -289,6 +288,110 @@ function iosHint(){const ios=/iP(hone|ad|od)/.test(navigator.userAgent),sa=navig
  if(ios&&!sa&&!S.settings.iosHint){S.settings.iosHint=true;save();setTimeout(()=>toast('Install: tap Share ⬆︎ then “Add to Home Screen”',6000),1500)}}
 if('serviceWorker' in navigator&&location.protocol!=='file:'){navigator.serviceWorker.register('sw.js').then(()=>navigator.serviceWorker.ready).then(r=>{r.active&&r.active.postMessage('warm');setTimeout(checkOffline,4000)}).catch(()=>{})}
 async function checkOffline(){try{const c=await caches.open('buddy-mp-0.10.14');const ks=await c.keys();window.__offlineReady=ks.length>=6;if(ks.length<6)setTimeout(checkOffline,5000)}catch(e){}}
+// ---------- Buddy motivation: mood, tips, muscle levels, XP + outfits (all computed from local sets; small "seen" state in S.mot) ----------
+const XPR={pushups:1,squats:.8,situps:.7,pullups:3,jacks:.3,burpees:2.5,lunges:.9,calves:.3,plank:.5,deadhang:.5}; // per rep, or per second for holds
+const SECR={pushups:2.5,squats:2.5,situps:2.5,pullups:3.5,jacks:1,burpees:4,lunges:3,calves:1.5,plank:1,deadhang:1}; // ~seconds per rep (activity minutes)
+const SET_XP=5,xpNeed=n=>50*n*(n-1); // total XP to reach level n: L2 100, L3 300, L4 600, L5 1000 ...
+const OUTFITS=[['wrist','Wristbands',2,'wrist'],['shades','Sunglasses',3,'eyes'],['shorts','Blue shorts',4,'legs'],['gold','Gold headband',5,'band'],['gloves','Boxing gloves',6,'hands'],['redshorts','Red shorts',7,'legs'],['cape','Hero cape',8,'back'],['crown','Crown',10,'top']];
+const MGROUP={legs:['quads','glutes','hams','calves'],core:['abs','obliques'],'upper body':['chest','triceps','delts'],back:['lats','biceps','forearms']};
+const MLV=[25,75,175,350,600,1000,1600,2500];
+const xpOf=s=>Math.round(s.reps*(XPR[s.ex]||1))+SET_XP;
+const totalXP=()=>S.sets.reduce((a,s)=>a+xpOf(s),0);
+const lvOf=x=>{let n=1;while(x>=xpNeed(n+1))n++;return n};
+function M(){if(!S.mot)S.mot={xl:null,mlv:null,eq:{},tip:0};return S.mot}
+// muscle volume with a 21-day half-life: recent training counts fully, neglected muscles slowly shrink
+function mVol(){const now=Date.now(),acc={};for(const [k] of Engine.MUSCLES)acc[k]=0;
+ for(const s of S.sets){const w=Math.pow(.5,Math.max(0,now-s.t)/864e5/21),m=MUSC(s.ex),v=s.reps/(isH(s.ex)?2:1);for(const k in m)if(k in acc)acc[k]+=v*m[k]*w}return acc}
+const mLevel=v=>1+MLV.filter(t=>v>=t).length;
+function syncBuddy(){if(typeof Engine==='undefined')return;const acc=mVol();
+ for(const [k] of Engine.MUSCLES){const lv=.2+.8*(1-Math.exp(-acc[k]/600));Engine.T[k]=Engine.D[k]=lv;Engine.P[k]=0}Engine.draw()}
+// ----- outfits drawn in Buddy's line style -----
+const OL='stroke-linejoin="round" stroke-linecap="round"';
+const ODRAW={
+ wrist:['armF','<path d="M40 152L56 156" stroke="#5A0A1A" stroke-width="11" '+OL+'/><path d="M40 152L56 156" stroke="#FF4D6D" stroke-width="7" '+OL+'/>'],
+ gloves:['armF','<path d="M37 158L53 162" stroke="#6B0F1A" stroke-width="9" '+OL+'/><circle cx="45" cy="168" r="12.5" fill="#FF4D4D" stroke="#6B0F1A" stroke-width="3.5"/><path d="M39 163Q45 159 51 164" fill="none" stroke="#FFB3B3" stroke-width="2.5" '+OL+'/>'],
+ shades:['head','<path d="M73 58H127" stroke="#0B0D10" stroke-width="3.5" '+OL+'/><rect x="75" y="54" width="22" height="14" rx="6" fill="#0B0D10" stroke="#4DE3FF" stroke-width="2.5"/><rect x="103" y="54" width="22" height="14" rx="6" fill="#0B0D10" stroke="#4DE3FF" stroke-width="2.5"/><path d="M79 58l5 0M107 58l5 0" stroke="#fff" stroke-width="2" '+OL+'/>'],
+ gold:['head','<path d="M70 44Q100 28 130 44L128 54Q100 40 72 54Z" fill="#FFD84D" stroke="#8A6400" stroke-width="2.5" '+OL+'/><path d="M128 46L152 38L148 52Z" fill="#FFD84D" stroke="#8A6400" stroke-width="2.5" '+OL+'/>'],
+ crown:['head','<path d="M80 24L77 5L90 15L100 1L110 15L123 5L120 24Z" fill="#FFD84D" stroke="#8A6400" stroke-width="3" '+OL+'/><circle cx="100" cy="13" r="3" fill="#FF4D8D"/>'],
+ shorts:['legs','<path d="M83 152H117L120 190H103L100 172L97 190H80Z" fill="#4D7CFF" stroke="#13286E" stroke-width="3.5" '+OL+'/><path d="M84 160H116" stroke="#B3C8FF" stroke-width="2.5" '+OL+'/>'],
+ redshorts:['legs','<path d="M83 152H117L120 190H103L100 172L97 190H80Z" fill="#FF4D6D" stroke="#5A0A1A" stroke-width="3.5" '+OL+'/><path d="M84 160H116" stroke="#FFC2CC" stroke-width="2.5" '+OL+'/>'],
+ cape:['back','<path d="M72 92Q100 100 128 92L150 222Q100 236 50 222Z" fill="#8E3DFF" stroke="#3A0F7A" stroke-width="3.5" '+OL+' opacity=".95"/>']};
+let olay=null;
+function drawOutfit(){if(typeof Rig==='undefined')return;const eq=M().eq,L=lvOf(totalXP());
+ if(!olay){olay={};const r=Rig.rig;olay.back=document.createElementNS('http://www.w3.org/2000/svg','g');r.insertBefore(olay.back,r.firstChild);
+  olay.legs=document.createElementNS('http://www.w3.org/2000/svg','g');const hd=Rig.head;r.insertBefore(olay.legs,hd);
+  olay.head=document.createElementNS('http://www.w3.org/2000/svg','g');hd.appendChild(olay.head);olay.armF=[...r.querySelectorAll('.armF')].map(f=>{const g=document.createElementNS('http://www.w3.org/2000/svg','g');f.appendChild(g);return g})}
+ const on=id=>{const o=OUTFITS.find(x=>x[0]===id);return o&&eq[o[3]]===id&&L>=o[2]};
+ const pick=host=>Object.keys(ODRAW).filter(id=>ODRAW[id][0]===host&&on(id)).map(id=>ODRAW[id][1]).join('');
+ olay.back.innerHTML=pick('back');olay.legs.innerHTML=pick('legs');olay.head.innerHTML=pick('head');const a=pick('armF');olay.armF.forEach(g=>g.innerHTML=a)}
+// ----- mood -----
+function daysSinceLast(){if(!S.sets.length)return null;const l=dk(Math.max(...S.sets.map(s=>s.t)));let n=0,d=today();while(d>l&&n<999){d=addD(d,-1);n++}return n}
+function mood(){const n=daysSinceLast(),h=new Date().getHours();
+ if(n===null)return ['fresh','Hi, I’m Buddy! Let’s do your first set together.'];
+ if(n===0)return ['happy','We trained today — I feel great! 💪'];
+ if(n===1){if(h<12)return ['ready','Ready when you are!'];if(h<18)return ['restless','Getting restless… one quick set?'];return ['slump','It’s getting late — even one set counts.']}
+ if(n===2)return ['sad','I missed you yesterday…'];
+ return ['nap','Zzz… wake me up with a set.']}
+let justLogged=false,bubT=0,moodNode=null;
+function ensureMoodLayer(){if(moodNode||typeof Rig==='undefined')return;const w=Rig.wrap,ns='http://www.w3.org/2000/svg';
+ moodNode=document.createElementNS(ns,'g');moodNode.id='moodG';w.parentNode.insertBefore(moodNode,w);moodNode.appendChild(w);
+ const couch=document.createElementNS(ns,'g');couch.id='couch';couch.innerHTML='<path d="M-10 182H210V246H-10Z" fill="#2A3442" stroke="#4DE3FF" stroke-width="3" stroke-opacity=".5" stroke-linejoin="round"/>';
+ moodNode.parentNode.insertBefore(couch,moodNode);
+ const front=document.createElementNS(ns,'g');front.id='couchF';front.innerHTML='<path d="M-22 230H222V270H-22Z" fill="#334050" stroke="#4DE3FF" stroke-width="3" stroke-opacity=".6" stroke-linejoin="round"/><path d="M-30 196H0V276H-30ZM200 196H230V276H200Z" fill="#3B4A5C" stroke="#4DE3FF" stroke-width="3" stroke-opacity=".6" stroke-linejoin="round"/><path d="M-26 276V286M226 276V286" stroke="#4DE3FF" stroke-width="4" stroke-opacity=".5" stroke-linecap="round"/>';
+ moodNode.parentNode.insertBefore(front,moodNode.nextSibling);
+ const z=document.createElementNS(ns,'g');z.id='zzz';z.innerHTML='<text x="140" y="60">z</text><text x="162" y="36">z</text><text x="186" y="12">Z</text>';moodNode.parentNode.appendChild(z);
+ const f=document.createElementNS(ns,'g');f.setAttribute('data-f','ez');f.setAttribute('class','fx');f.innerHTML='<path d="M80 63Q87 68 94 63M106 63Q113 68 120 63" fill="none" stroke="#1B2A06" stroke-width="4" stroke-linecap="round"/>';Rig.face.appendChild(f)}
+const FACE={fresh:['eo','mhappy','cheek'],happy:['eh','mhappy','cheek'],ready:['eo','mok'],restless:['eo','mok','sweat'],slump:['eo','msad'],sad:['eo','msad'],nap:['ez','mok'],cheer:['eh','mhappy','cheek']};
+function setMood(m){const st=document.querySelector('.stage');st.classList.remove(...['fresh','happy','ready','restless','slump','sad','nap','cheer'].map(x=>'m-'+x));st.classList.add('m-'+m);st.dataset.mood=m;try{Rig.setF(FACE[m])}catch(e){}}
+function motHome(){ensureMoodLayer();drawOutfit();let [m,cap]=mood();
+ if(justLogged&&m==='happy'){justLogged=false;setMood('cheer');$('moodCap').textContent='Yes! That set made me stronger! 🎉';try{BV2.flex(1600)}catch(e){}setTimeout(()=>{if(cur==='home')setMood('happy'),$('moodCap').textContent=cap},2600)}
+ else setMood(m),$('moodCap').textContent=cap;
+ renderXP();setTimeout(levelEvents,m==='nap'?400:900)}
+// re-assert the mood face after the rig's own face updates (flex end etc.)
+setInterval(()=>{const st=document.querySelector('.stage');if(cur==='home'&&st&&st.dataset.mood&&!st.classList.contains('flexing')){const f=FACE[st.dataset.mood];if(f&&!(Rig.face.querySelector('[data-f="'+f[0]+'"]')||{}).classList?.contains('on'))try{Rig.setF(f)}catch(e){}}},1500);
+// ----- XP bar + level / muscle events -----
+function renderXP(){const x=totalXP(),L=lvOf(x),a=xpNeed(L),b=xpNeed(L+1);$('xpLv').textContent='Level '+L;$('xpFill').style.width=Math.round((x-a)/(b-a)*100)+'%';
+ const nx=OUTFITS.find(o=>o[2]>L);$('xpTxt').textContent=`${x-a} / ${b-a} XP`+(nx&&nx[2]===L+1?` · next: ${nx[1]}`:'');
+ $('xpBtn').setAttribute('aria-label',`Level ${L}, ${b-x} XP to level ${L+1}. Open Buddy’s wardrobe and muscles`)}
+const evQ=[];let evBusy=false;
+function levelEvents(){const mo=M(),x=totalXP(),L=lvOf(x),vol=mVol(),ml={};for(const k in vol)ml[k]=mLevel(vol[k]);
+ if(mo.xl==null){mo.xl=L;mo.mlv=ml;save();if(S.sets.length&&L>1)toast(`Buddy XP is here — your past sets put you at level ${L}!`,4200);return}
+ if(L>mo.xl){const un=OUTFITS.filter(o=>o[2]>mo.xl&&o[2]<=L).map(o=>o[1]);evQ.push({t:`Level ${L}!`,s:un.length?'Unlocked: '+un.join(', '):'Keep going!',lv:true});mo.xl=L}
+ const ups=Object.keys(ml).filter(k=>ml[k]>(mo.mlv[k]||1)).sort((a,b)=>ml[b]-ml[a]);
+ for(const k of ups.slice(0,2))evQ.push({t:`${Engine.NAME[k].split(' /')[0]} level ${ml[k]}!`,s:'Buddy is flexing it for you',m:k});
+ mo.mlv=ml;save();runEv()}
+function runEv(){if(evBusy||!evQ.length||cur!=='home')return;evBusy=true;const e=evQ.shift(),b=$('mBan');
+ b.innerHTML=`<b>${e.t}</b><small>${e.s}</small>`;b.className='mBan on'+(e.lv?' lv':'');
+ const els=e.m?Rig.els(e.m):[];els.forEach(n=>n.classList.add('mHot'));try{BV2.flex(2600,true)}catch(x){}
+ setTimeout(()=>{b.className='mBan';els.forEach(n=>n.classList.remove('mHot'));evBusy=false;if(e.lv)drawOutfit();setTimeout(runEv,400)},3200);try{if(e.lv){confetti();say(e.t+' '+e.s)}else say(e.t)}catch(x){console.warn('mot fx',x)}}
+// ----- tap Buddy: data-driven coaching tips -----
+function tips(){const T=[],d=today(),y=addD(d,-1),st=streak(),x=totalXP(),L=lvOf(x);
+ if(!S.sets.length)return ['Tap “Start workout” — even 5 push-ups is a great first set!','I grow muscles as you train. Every set counts!'];
+ for(const e of EXS){const ty=dayTot(e,y),td=dayTot(e,d);if(ty>0&&td<=ty){const n=ty-td+1;T.push(isH(e)?`${n} more second${n>1?'s':''} of ${EXL[e]} beats yesterday!`:`${n} more ${n===1?EXL[e].replace(/s$/,''):EXL[e]} beats yesterday!`)}}
+ for(const e of EXS.filter(isH)){const b=best(e),l=lastOf(e);if(b&&l&&l.reps<b)T.push(`${EXN[e]} day? Your last hold was ${b-l.reps} s off your best (${mmss(b)}).`);else if(b)T.push(`Your best ${EXL[e]} is ${mmss(b)}. Can you hold ${mmss(b+5)}?`)}
+ const lastHit=ms=>{let t=0;for(const s of S.sets){const m=MUSC(s.ex);if(ms.some(k=>(m[k]||0)>=.8))t=Math.max(t,s.t)}return t};
+ for(const g in MGROUP){const t=lastHit(MGROUP[g]);if(t){const n=Math.floor((pd(d)-pd(dk(t)))/864e5);if(n>=3)T.push(`You haven’t trained ${g} in ${n} days.`)}}
+ if(st>0)T.push(activeDay(d)?`🔥 ${st}-day streak — today is done!`:`🔥 ${st}-day streak — one set keeps it alive.`);
+ for(const e of GE()){const g=S.goals[e],t=dayTot(e,d);if(t<g)T.push(isH(e)?`${mmss(g-t)} of ${EXL[e]} to hit today’s goal.`:`${g-t} ${EXL[e]} to hit today’s goal.`)}
+ const wk=S.sets.filter(s=>dk(s.t)>addD(d,-7)).reduce((a,s)=>a+s.reps*(SECR[s.ex]||2),0)/60;
+ T.push(`About ${Math.max(1,Math.round(wk))} active minute${Math.round(wk)===1?'':'s'} logged this week. A common activity guideline is 150 minutes a week — everything counts.`);
+ const nx=OUTFITS.find(o=>o[2]>L);T.push(nx?`${xpNeed(nx[2])-x} XP until I unlock the ${nx[1].toLowerCase()}!`:`${xpNeed(L+1)-x} XP to level ${L+1}.`);
+ const v=mVol();let bm=null,bg=1e9;for(const k in v){const lv=mLevel(v[k]);if(lv<=MLV.length){const gap=MLV[lv-1]-v[k];if(v[k]>0&&gap<bg){bg=gap;bm=[k,lv]}}}
+ if(bm)T.push(`My ${Engine.NAME[bm[0]].split(' /')[0].toLowerCase()} are close to level ${bm[1]+1}!`);
+ return T}
+function showTip(){const T=tips(),mo=M(),t=T[(mo.tip||0)%T.length];mo.tip=(mo.tip||0)+1;save();const b=$('bubble');b.textContent=t;b.classList.add('on');
+ if(document.querySelector('.stage').dataset.mood==='nap'){Rig.setF(['eo','mok'])}
+ try{if(!CAMM.muted)say(t)}catch(e){}clearTimeout(bubT);bubT=setTimeout(()=>b.classList.remove('on'),6000)}
+$('fig').addEventListener('click',e=>{if(cur==='home'){e.stopImmediatePropagation();showTip()}},true);
+$('bubble').onclick=()=>$('bubble').classList.remove('on');
+// ----- wardrobe + muscle levels screen -----
+function renderWard(){const x=totalXP(),L=lvOf(x),eq=M().eq;place('slotWard');ensureMoodLayer();drawOutfit();setMood('happy');
+ $('wLv').textContent=`Level ${L} · ${x} XP`;
+ $('wGrid').innerHTML=OUTFITS.map(([id,n,lv,slot])=>{const un=L>=lv,on=eq[slot]===id;return `<button class="wItem${on?' on':''}" data-id="${id}" data-slot="${slot}" ${un?'':'disabled'} aria-pressed="${on}"><b>${n}</b><small>${un?(on?'Wearing ✓':'Tap to wear'):'🔒 Level '+lv}</small></button>`}).join('');
+ const v=mVol();$('wMus').innerHTML=Engine.MUSCLES.map(([k,n])=>{const lv=mLevel(v[k]),a=lv>1?MLV[lv-2]:0,b=MLV[lv-1]||a,p=b>a?Math.min(100,Math.round((v[k]-a)/(b-a)*100)):100;return `<div class="mRow"><span>${n}</span><b>Lv ${lv}</b><i><u style="width:${p}%"></u></i></div>`}).join('')}
+$('wGrid').onclick=e=>{const b=e.target.closest('.wItem');if(!b||b.disabled)return;const eq=M().eq,s=b.dataset.slot;eq[s]=eq[s]===b.dataset.id?'':b.dataset.id;save();renderWard()};
+$('xpBtn').onclick=()=>show('ward');
+
 // ---------- boot ----------
 try{BV2.setStyle(5)}catch(e){}
 const ups=checkGoals();checkBadges();
