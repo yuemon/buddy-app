@@ -100,8 +100,10 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b
 function renderHome(){place('slotHome');syncBuddy();const d=today(),st=streak();
  $('streak').textContent='🔥 '+st+(st===1?' day':' days');
  let have=0,need=0;const rows=[],G=GE();
- $('tiles').innerHTML=VIS().map(e=>{const t=dayTot(e,d),g=S.goals[e],b=best(e);
-  return `<button class="tile${g&&t>=g?' hit':''}" data-ex="${e}" style="--c:${COL[e]}" aria-label="${EXN[e]}: ${fmt(e,t)}${g?' of '+fmt(e,g):''} today. Best ${b?fmt(e,b):'none yet'}. Tap to start."><span class="tn">${EXN[e]}</span>${SM(e,"smT")}<b class="tv">${fmt(e,t)}</b><span class="tg">${g?'of '+fmt(e,g)+' today':'no daily goal'}</span><span class="tb">${isH(e)?'Longest':'Best set'}: ${b?fmt(e,b):'–'}</span></button>`}).join('');
+ const V=VIS(),tile=e=>{const t=dayTot(e,d),g=S.goals[e],b=best(e),p=g?Math.min(1,t/g):0;
+  return `<button class="tile${g&&t>=g?' hit':''}" data-ex="${e}" style="--c:${COL[e]};--p:${p}" aria-label="${EXN[e]}: ${fmt(e,t)}${g?' of '+fmt(e,g):''} today. Best ${b?fmt(e,b):'none yet'}. Tap to start."><span class="tn">${EXN[e]}</span><span class="tr"><b class="tv">${fmt(e,t)}</b>${SM(e,"smT")}</span><span class="tg">${g?'Goal '+fmt(e,g):'No goal'}</span><span class="tb">${isH(e)?'Long':'Best'} ${b?fmt(e,b):'–'}</span>${g?'<i class="tp"></i>':''}</button>`};
+ const seen=new Set(),grp=CATS.map(([n,l])=>[n,V.filter(e=>l.includes(e))]);grp.forEach(g=>g[1].forEach(e=>seen.add(e)));const rest=V.filter(e=>!seen.has(e));if(rest.length)grp.push(['Other',rest]);
+ $('tiles').innerHTML=grp.filter(g=>g[1].length).map(([n,l])=>`<div class="tgrp" role="group" aria-label="${n}"><h2 class="tgH">${n}</h2><div class="tgG">${l.map(tile).join('')}</div></div>`).join('');
  for(const e of G){const t=dayTot(e,d),g=S.goals[e];have+=Math.min(t,g)/g;need++;
   rows.push(`<div class="gl"><i class="dot" style="background:${COL[e]}"></i>${EXN[e]} <b>${fmt(e,t)}</b>/${fmt(e,g)}${t>=g?' <span class="ok">✓</span>':''}</div>`)}
  const pct=need?Math.round(have/need*100):0;$('ringP').style.strokeDashoffset=314.16*(1-pct/100);

@@ -221,3 +221,23 @@ label.sw i::after{content:"";position:absolute;left:3px;top:3px;width:24px;heigh
 label.sw input:checked+i{background:var(--neon)}
 label.sw input:checked+i::after{transform:translateX(20px);background:#0B0D10}
 label.sw input:focus-visible+i{outline:3px solid #fff;outline-offset:2px}
+/* ===== Task E: 3-column grouped home grid ===== */
+.slot.home .stage{height:170px}
+.buddyBar{margin:-6px 0 6px}.moodCap{margin:4px 4px 6px;font-size:17px}
+.goalRow{margin:4px 0 6px;gap:12px}.ringBtn,.gring{width:112px;height:112px}
+.ringBtn .ringTxt b{font-size:30px}
+#tiles.tiles{display:block}
+.tgrp{margin:0 0 8px}
+.tgH{margin:0;padding:4px 4px 5px;color:var(--ink2);font:800 13px/1.1 "Barlow",sans-serif;letter-spacing:.07em;text-transform:uppercase}
+.tgG{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+#tiles .tile{min-height:104px!important;padding:7px 7px 8px;border-radius:14px;gap:0;overflow:hidden;justify-content:flex-start}
+#tiles .tile .tn{display:block;font-size:13.5px;line-height:1.15;min-height:2.3em;width:100%;padding-right:1px;overflow-wrap:anywhere;hyphens:auto}
+#tiles .tile .tr{display:flex;align-items:center;justify-content:space-between;width:100%;gap:2px;margin:2px 0 1px}
+#tiles .tile .tv{font-size:32px;line-height:1;white-space:nowrap}
+#tiles .smT{position:static;width:32px;height:32px;flex:none}
+#tiles .tile .tg,#tiles .tile .tb{font-size:12.5px;line-height:1.25;white-space:nowrap;margin:0}
+#tiles .tile .tg{color:var(--ink2)}
+#tiles .tile .tp{position:absolute;left:0;bottom:0;height:3px;width:calc(var(--p)*100%);background:var(--c)}
+@media (max-width:370px){#tiles .tile .tn{font-size:12.5px}#tiles .tile .tv{font-size:28px}#tiles .smT{width:28px;height:28px}#tiles .tile{padding:6px}}
+@media (min-width:600px){.tgG{grid-template-columns:repeat(4,minmax(0,1fr))}}
+body.app{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
