@@ -15,6 +15,8 @@ const fmt=(e,v)=>isH(e)?mmss(v):String(v);              // holds are stored in s
 const unitW=(e,v)=>isH(e)?(v===1?'second':'seconds'):(v===1?EXL[e].replace(/s$/,''):EXL[e]);
 const sayV=(e,v)=>isH(e)?(v>=60?Math.floor(v/60)+' minute'+(v>=120?'s':'')+(v%60?' '+(v%60)+' seconds':''):v+' seconds'):v+' '+EXL[e];
 // muscles each exercise grows (same maps the shared engine uses for highlights); holds: 2 s ≈ 1 rep of work
+if(typeof ICONS!=='undefined')ICONS.burpees='<circle cx="6.5" cy="31" r="3"/><path d="M10.5 33.5L24 38.5M12.5 35V40.5"/><circle cx="36" cy="9" r="3.5"/><path d="M36 14V26L32 34M36 26L40 34M36 16L30 7M36 16L42 7"/><path class="fl" d="M3 41.5H45"/>';
+const SM=(e,c)=>`<svg class="sm ${c||''}" viewBox="0 0 48 48" aria-hidden="true" focusable="false" style="--c:${COL[e]}">${(typeof ICONS!=="undefined"&&ICONS[e])||''}</svg>`;
 const MUSC=e=>(window.Engine&&Engine.EXMAP&&Engine.EXMAP[e]&&Engine.EXMAP[e].m)||{};
 const work=e=>allTot(e)/(isH(e)?2:1);
 const KEY='buddy.v1';
@@ -87,7 +89,7 @@ function renderHome(){place('slotHome');syncBuddy();const d=today(),st=streak();
  $('streak').textContent='🔥 '+st+(st===1?' day':' days');
  let have=0,need=0;const rows=[],G=GE();
  $('tiles').innerHTML=EXS.map(e=>{const t=dayTot(e,d),g=S.goals[e],b=best(e);
-  return `<button class="tile${g&&t>=g?' hit':''}" data-ex="${e}" style="--c:${COL[e]}" aria-label="${EXN[e]}: ${fmt(e,t)}${g?' of '+fmt(e,g):''} today. Best ${b?fmt(e,b):'none yet'}. Tap to start."><span class="tn"><i class="dot"></i>${EXN[e]}</span><b class="tv">${fmt(e,t)}</b><span class="tg">${g?'of '+fmt(e,g)+' today':'no daily goal'}</span><span class="tb">${isH(e)?'Longest':'Best set'}: ${b?fmt(e,b):'–'}</span></button>`}).join('');
+  return `<button class="tile${g&&t>=g?' hit':''}" data-ex="${e}" style="--c:${COL[e]}" aria-label="${EXN[e]}: ${fmt(e,t)}${g?' of '+fmt(e,g):''} today. Best ${b?fmt(e,b):'none yet'}. Tap to start."><span class="tn">${EXN[e]}</span>${SM(e,"smT")}<b class="tv">${fmt(e,t)}</b><span class="tg">${g?'of '+fmt(e,g)+' today':'no daily goal'}</span><span class="tb">${isH(e)?'Longest':'Best set'}: ${b?fmt(e,b):'–'}</span></button>`}).join('');
  for(const e of G){const t=dayTot(e,d),g=S.goals[e];have+=Math.min(t,g)/g;need++;
   rows.push(`<div class="gl"><i class="dot" style="background:${COL[e]}"></i>${EXN[e]} <b>${fmt(e,t)}</b>/${fmt(e,g)}${t>=g?' <span class="ok">✓</span>':''}</div>`)}
  const pct=need?Math.round(have/need*100):0;$('ringP').style.strokeDashoffset=314.16*(1-pct/100);
@@ -99,8 +101,8 @@ function renderHome(){place('slotHome');syncBuddy();const d=today(),st=streak();
 $('tiles').onclick=e=>{const b=e.target.closest('.tile');if(b){ex=b.dataset.ex;show('pick')}};
 $('startBtn').onclick=()=>{const d=today(),G=GE(),f=e=>dayTot(e,d)/S.goals[e];const L=G.filter(e=>f(e)<1).sort((a,b)=>f(a)-f(b));ex=L[0]||S.settings.lastEx||'pushups';show('pick')};
 // ---------- 2. picker ----------
-function renderPick(){$('pTitle').textContent=EXN[ex];
- $('chips').innerHTML=EXS.map(e=>`<button role="radio" data-ex="${e}" aria-checked="${e===ex}">${EXN[e]}</button>`).join('');
+function renderPick(){$('pTitle').innerHTML=SM(ex,'smH')+EXN[ex];
+ $('chips').innerHTML=EXS.map(e=>`<button role="radio" data-ex="${e}" aria-checked="${e===ex}">${SM(e,"smC")}${EXN[e]}</button>`).join('');
  const sel=$('chips').querySelector('[aria-checked="true"]');if(sel)sel.scrollIntoView({block:'nearest',inline:'center'});
  const h=isH(ex),m=S.settings.lastMode[ex];$('pickTimer').hidden=!h;
  $('pickCam').querySelector('b').textContent=h?'Camera timer':'Count for me';
@@ -135,7 +137,7 @@ function cmpText(r){const d=r.prevLast==null?null:r.set.reps-r.prevLast,h=isH(r.
 // ---------- 5. set complete ----------
 let pulseT;
 function showDone(r){place('slotDone');show('done');const e=r.set.ex,isPB=r.prevBest>0&&r.set.reps>r.prevBest;
- $('dReps').textContent=fmt(e,r.set.reps);$('dUnit').textContent=isH(e)?EXL[e]+' hold':unitW(e,r.set.reps);
+ $('dReps').textContent=fmt(e,r.set.reps);$('dIco').innerHTML=SM(e,'smD');$('dUnit').textContent=isH(e)?EXL[e]+' hold':unitW(e,r.set.reps);
  const [ct,cs]=cmpText(r);$('dCmp').textContent=ct;$('dPB').hidden=!isPB;
  const t=dayTot(e,today()),g=S.goals[e];$('dSum').textContent=!g?`Today: ${fmt(e,t)} ${isH(e)?'of '+EXL[e]:EXL[e]}`:t>=g?`🎯 ${EXN[e]} goal reached today: ${fmt(e,t)} / ${fmt(e,g)}`:`Today: ${fmt(e,t)} / ${fmt(e,g)} ${isH(e)?'':EXL[e]+' '}· ${fmt(e,g-t)} to go`;
  syncBuddy();setTimeout(syncBuddy,2600);try{BV2.setView('f',true);BV2.flex(2800,true)}catch(x){}
@@ -183,7 +185,7 @@ $('setList').onclick=e=>{const b=e.target.closest('button[data-id]');if(!b)retur
 // ---------- 4b. voice hold timer (plank, dead hang): say "start" / "done", or tap ----------
 const SRC=window.SpeechRecognition||window.webkitSpeechRecognition||null;
 let hRec=null,hWant=false,hMode='off',hT0=0,hI=0,hLast=0,hPB=0,hSaidPB=false,hCmdT=0;
-function goHold(){lastRun='timer';show('hold');$('hdTitle').textContent=EXN[ex];$('holdToday').textContent=todayTxt(ex);
+function goHold(){lastRun='timer';show('hold');$('hdTitle').innerHTML=SM(ex,'smH')+EXN[ex];$('holdToday').textContent=todayTxt(ex);
  hPB=best(ex);hSaidPB=false;hLast=0;$('holdNum').textContent='0:00';$('holdBest').textContent=hPB?'Longest so far: '+mmss(hPB):'';
  hMode='wait';$('holdFace').classList.remove('run');$('holdStop').hidden=true;
  $('holdSay').textContent=SRC?'Say “START”':'Tap to START';$('holdSub').textContent=SRC?'or tap here to start':'Voice isn’t available here — tap to start';
@@ -254,7 +256,7 @@ function calendar(){const d=today(),start=addD(monday(d),-28);let s='<div class=
 function renderStats(){const u=S.settings.units,wu=u==='kg'?'kg':'lb',cu=u==='kg'?'cm':'in',st=streak();S.bestStreak=Math.max(S.bestStreak||0,st);
  const shown=EXS.filter(e=>S.goals[e]>0||S.sets.some(s=>s.ex===e)),days=new Set(S.sets.map(s=>dk(s.t))).size,B=S.body.slice().sort((a,b)=>a.d<b.d?1:-1);
  $('statsBody').innerHTML=`
- ${shown.map(e=>`<div class="card"><h3><i class="dot" style="background:${COL[e]}"></i>${EXN[e]} <small>last 7 days${isH(e)?' · m:ss':''}</small></h3>${bars(e)}</div>`).join('')}
+ ${shown.map(e=>`<div class="card"><h3>${SM(e,"smS")}${EXN[e]} <small>last 7 days${isH(e)?' · m:ss':''}</small></h3>${bars(e)}</div>`).join('')}
  <div class="card"><h3>Personal bests & totals</h3><div class="kv">
   ${shown.map(e=>`<div><b style="color:${COL[e]}">${best(e)?fmt(e,best(e)):'–'}</b><span>${isH(e)?'Longest '+EXL[e]:'Best '+EXL[e].replace(/s$/,'')+' set'}</span></div><div><b>${isH(e)?mmss(allTot(e)):allTot(e).toLocaleString()}</b><span>${EXN[e]} all time</span></div>`).join('')}
   <div><b>🔥 ${st}</b><span>Day streak (best ${S.bestStreak})</span></div><div><b>${days}</b><span>Workout days</span></div></div></div>

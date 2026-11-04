@@ -153,3 +153,15 @@ dialog .btn.danger{color:var(--bad);border-color:var(--bad)}
 .holdBest{text-align:center;font-size:19px;font-weight:700;min-height:24px}
 .stopBig{min-height:110px!important;font-size:40px!important;background:var(--bad)!important;color:#fff!important}
 body.holdcam #cmGo{min-height:96px;font-size:34px}
+
+/* stick-figure exercise pictures (icons.js line art) */
+.sm{fill:none;stroke:var(--c,var(--neon));stroke-width:3.4;stroke-linecap:round;stroke-linejoin:round;flex:none;filter:drop-shadow(0 0 3px color-mix(in srgb,var(--c,#C6FF3D) 45%,transparent))}
+.sm .fl{stroke-width:2.2;opacity:.4}
+.tile{position:relative}
+.smT{position:absolute;right:8px;top:34px;width:54px;height:54px}
+.smC{width:26px;height:26px;margin:0 6px 0 -4px;vertical-align:-7px}
+.chips button[aria-checked="false"] .smC{opacity:.7}
+.smH{width:40px;height:40px;vertical-align:-9px;margin-right:8px}
+#pTitle,#hdTitle{display:flex;align-items:center}
+.smS{width:28px;height:28px;vertical-align:-8px;margin-right:6px}
+#dIco{display:flex;justify-content:center}.smD{width:56px;height:56px;margin-bottom:-4px}
