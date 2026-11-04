@@ -7,7 +7,22 @@ const XT={pushups:['Push-ups','push-ups','rep',50,'#C6FF3D','💪'],squats:['Squ
  situps:['Sit-ups','sit-ups','rep',0,'#FFD84D','🔥'],pullups:['Pull-ups','pull-ups','rep',0,'#FF9F43','🧗'],
  jacks:['Jumping jacks','jumping jacks','rep',0,'#B98CFF','⭐'],burpees:['Burpees','burpees','rep',0,'#FF6F8D','⚡'],
  lunges:['Lunges','lunges','rep',0,'#3DFFB5','🚶'],calves:['Calf raises','calf raises','rep',0,'#7FB2FF','🦶'],
- plank:['Plank','plank','hold',0,'#FFC2E0','⏱'],deadhang:['Dead hang','dead hang','hold',0,'#FFE7A3','🙌']};
+ plank:['Plank','plank','hold',0,'#FFC2E0','⏱'],deadhang:['Dead hang','dead hang','hold',0,'#FFE7A3','🙌'],
+ kneepush:['Knee push-ups','knee push-ups','rep',0,'#D9FF85','💪'],wallpush:['Wall push-ups','wall push-ups','rep',0,'#B8F0A0','🧱'],
+ sitstand:['Sit-to-stand','sit-to-stands','rep',0,'#8FEFFF','🪑'],glutes:['Glute bridges','glute bridges','rep',0,'#FF8FB8','🍑'],
+ wallsit:['Wall sit','wall sit','hold',0,'#7FE0D0','🧱'],sideplank:['Side plank','side plank','hold',0,'#FFB3D1','⏱'],
+ superman:['Superman','supermen','rep',0,'#FF5C5C','🦸'],birddog:['Bird dog','bird dogs','rep',0,'#C9A27A','🐕'],
+ climbers:['Mountain climbers','mountain climbers','rep',0,'#FFA35C','⛰'],highknees:['High knees','high knees','rep',0,'#FF7AE0','🏃'],
+ march:['Marching','marching steps','rep',0,'#A0C4FF','🚶'],stepjacks:['Step jacks','step jacks','rep',0,'#D4B8FF','⭐'],
+ chinups:['Chin-ups','chin-ups','rep',0,'#FFB870','🧗'],scappulls:['Scapular pulls','scapular pulls','rep',0,'#FFD9A0','🙌'],
+ kneeraises:['Hanging knee raises','knee raises','rep',0,'#FFE066','🦵'],legraises:['Hanging leg raises','leg raises','rep',0,'#F5C542','🦵']};
+// categories for Settings › Choose exercises (each exercise lives in one group)
+const CATS=[['Upper body',['pushups','kneepush']],['Lower body',['squats','lunges','calves','glutes','wallsit']],['Core',['situps','plank','sideplank','superman','birddog']],
+ ['Cardio',['jacks','burpees','climbers','highknees']],['Pull-up bar',['pullups','chinups','deadhang','scappulls','kneeraises','legraises']],['Beginner / low-impact',['wallpush','sitstand','march','stepjacks']]];
+const VIS0=['pushups','squats','situps','pullups','jacks','burpees','lunges','calves','plank','deadhang'];
+// camera counting is offered only where the pose counter has a config for it (others are manual / voice-timer only)
+const NOCAM=new Set(['wallpush','birddog','scappulls','sideplank','superman']);
+const hasCam=e=>!NOCAM.has(e)&&!!(window.BCount&&BCount.CFG&&BCount.CFG[e]);
 const EXS=Object.keys(XT),EXN={},EXL={},COL={};EXS.forEach(e=>{EXN[e]=XT[e][0];EXL[e]=XT[e][1];COL[e]=XT[e][4]});
 const isH=e=>XT[e]&&XT[e][2]==='hold';
 const mmss=v=>{v=Math.round(v);return Math.floor(v/60)+':'+String(v%60).padStart(2,'0')};
@@ -21,7 +36,7 @@ const MUSC=e=>(typeof Engine!=='undefined'&&Engine.EXMAP&&Engine.EXMAP[e]&&Engin
 const work=e=>allTot(e)/(isH(e)?2:1);
 const KEY='buddy.v1';
 const DEF=()=>({v:1,sets:[],goals:Object.fromEntries(EXS.map(e=>[e,XT[e][3]])),goalWeek:null,body:[],badges:{},bestStreak:0,
- settings:{rest:60,remind:'',units:'kg',lastMode:Object.fromEntries(EXS.map(e=>[e,isH(e)?'timer':'cam'])),lastEx:'pushups',iosHint:false}});
+ settings:{rest:60,remind:'',units:'kg',lastMode:Object.fromEntries(EXS.map(e=>[e,isH(e)?'timer':NOCAM.has(e)?'man':'cam'])),vis:VIS0.slice(),lastEx:'pushups',iosHint:false}});
 let S=load();
 function load(){try{const s=JSON.parse(localStorage.getItem(KEY));if(s&&s.v===1){const d=DEF();return {...d,...s,goals:{...d.goals,...s.goals},settings:{...d.settings,...s.settings,lastMode:{...d.settings.lastMode,...(s.settings||{}).lastMode}}}}}catch(e){}return DEF()}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}mirror()}
@@ -42,7 +57,8 @@ const allTot=ex=>S.sets.filter(s=>ex?s.ex===ex:!isH(s.ex)).reduce((a,s)=>a+s.rep
 const best=ex=>S.sets.filter(s=>s.ex===ex).reduce((a,s)=>Math.max(a,s.reps),0);
 const lastOf=ex=>{for(let i=S.sets.length-1;i>=0;i--)if(S.sets[i].ex===ex)return S.sets[i];return null};
 const activeDay=day=>S.sets.some(s=>dk(s.t)===day);
-const GE=()=>EXS.filter(e=>S.goals[e]>0);
+const VIS=()=>{const v=(Array.isArray(S.settings.vis)?S.settings.vis:VIS0).filter((e,i,a)=>XT[e]&&a.indexOf(e)===i);return v.length?v:VIS0.slice()};
+const GE=()=>VIS().filter(e=>S.goals[e]>0);
 const goalDay=day=>GE().length>0&&GE().every(e=>dayTot(e,day)>=S.goals[e]);
 function streak(){let d=today();if(!activeDay(d))d=addD(d,-1);let n=0;while(activeDay(d)){n++;d=addD(d,-1)}return n}
 // ---------- motivation: weekly goal bump, badges ----------
@@ -53,7 +69,7 @@ function checkGoals(){const wk=monday(today());if(!S.goalWeek){S.goalWeek=wk;sav
    if(hit>=4){const g=S.goals[e],n=Math.min(isH(e)?900:400,Math.max(g+(isH(e)?5:2),Math.round(g*1.08)));S.goals[e]=n;up.push(`${EXN[e]} goal up to ${fmt(e,n)}${isH(e)?' min':''} a day — you smashed last week!`)}}
   S.goalWeek=addD(w,7)}
  save();return up}
-const BADGES=[['first','🎉','First set',()=>S.sets.length>=1],['c100','💯','First 100 reps',()=>allTot()>=100],['r20','💪','20-rep set',()=>S.sets.some(s=>!isH(s.ex)&&s.reps>=20)],['h60','⏱','1-minute hold',()=>S.sets.some(s=>isH(s.ex)&&s.reps>=60)],['all10','🌈','Tried all 10',()=>EXS.every(e=>S.sets.some(s=>s.ex===e))],
+const BADGES=[['first','🎉','First set',()=>S.sets.length>=1],['c100','💯','First 100 reps',()=>allTot()>=100],['r20','💪','20-rep set',()=>S.sets.some(s=>!isH(s.ex)&&s.reps>=20)],['h60','⏱','1-minute hold',()=>S.sets.some(s=>isH(s.ex)&&s.reps>=60)],['all10','🌈','Tried 10 different exercises',()=>new Set(S.sets.map(s=>s.ex)).size>=10],['allx','🧭','Tried every exercise ('+EXS.length+')',()=>EXS.every(e=>S.sets.some(s=>s.ex===e))],
  ['goal','🎯','Daily goal smashed',()=>S.sets.some(s=>goalDay(dk(s.t)))],['s7','🔥','7-day streak',()=>S.bestStreak>=7],['c1000','🏅','1,000 club',()=>allTot()>=1000],['s30','👑','30-day streak',()=>S.bestStreak>=30]];
 function checkBadges(){S.bestStreak=Math.max(S.bestStreak||0,streak());const n=[];for(const [id,e,name,f] of BADGES)if(!S.badges[id]&&f()){S.badges[id]=today();n.push(e+' Badge: '+name)}if(n.length)save();return n}
 // ---------- Buddy: muscles grow with lifetime reps ----------
@@ -84,7 +100,7 @@ document.addEventListener('click',e=>{const b=e.target.closest('[data-go]');if(b
 function renderHome(){place('slotHome');syncBuddy();const d=today(),st=streak();
  $('streak').textContent='🔥 '+st+(st===1?' day':' days');
  let have=0,need=0;const rows=[],G=GE();
- $('tiles').innerHTML=EXS.map(e=>{const t=dayTot(e,d),g=S.goals[e],b=best(e);
+ $('tiles').innerHTML=VIS().map(e=>{const t=dayTot(e,d),g=S.goals[e],b=best(e);
   return `<button class="tile${g&&t>=g?' hit':''}" data-ex="${e}" style="--c:${COL[e]}" aria-label="${EXN[e]}: ${fmt(e,t)}${g?' of '+fmt(e,g):''} today. Best ${b?fmt(e,b):'none yet'}. Tap to start."><span class="tn">${EXN[e]}</span>${SM(e,"smT")}<b class="tv">${fmt(e,t)}</b><span class="tg">${g?'of '+fmt(e,g)+' today':'no daily goal'}</span><span class="tb">${isH(e)?'Longest':'Best set'}: ${b?fmt(e,b):'–'}</span></button>`}).join('');
  for(const e of G){const t=dayTot(e,d),g=S.goals[e];have+=Math.min(t,g)/g;need++;
   rows.push(`<div class="gl"><i class="dot" style="background:${COL[e]}"></i>${EXN[e]} <b>${fmt(e,t)}</b>/${fmt(e,g)}${t>=g?' <span class="ok">✓</span>':''}</div>`)}
@@ -95,17 +111,17 @@ function renderHome(){place('slotHome');syncBuddy();const d=today(),st=streak();
  $('homeNote').textContent=need&&pct>=100?'Goal done today — Buddy is proud of you! Extra sets still grow muscle.':st&&!activeDay(d)?`Keep your ${st}-day streak alive — even one set counts.`:pct===0&&left.length>1?'Short sets add up. One set of each is a great start.':left.length?`Just ${left.slice(0,3).join(' and ')} to go.`:'';
  $('startBtn').textContent=activeDay(d)?'Keep going':'Start workout';motHome()}
 $('tiles').onclick=e=>{const b=e.target.closest('.tile');if(b){ex=b.dataset.ex;show('pick')}};
-$('startBtn').onclick=()=>{const d=today(),G=GE(),f=e=>dayTot(e,d)/S.goals[e];const L=G.filter(e=>f(e)<1).sort((a,b)=>f(a)-f(b));ex=L[0]||S.settings.lastEx||'pushups';show('pick')};
+$('startBtn').onclick=()=>{const d=today(),G=GE(),f=e=>dayTot(e,d)/S.goals[e];const L=G.filter(e=>f(e)<1).sort((a,b)=>f(a)-f(b));const V=VIS();ex=L[0]||(V.includes(S.settings.lastEx)?S.settings.lastEx:V[0]);show('pick')};
 // ---------- 2. picker ----------
 function renderPick(){$('pTitle').innerHTML=SM(ex,'smH')+EXN[ex];
- $('chips').innerHTML=EXS.map(e=>`<button role="radio" data-ex="${e}" aria-checked="${e===ex}">${SM(e,"smC")}${EXN[e]}</button>`).join('');
+ {const V=VIS();if(!V.includes(ex))V.unshift(ex);$('chips').innerHTML=V.map(e=>`<button role="radio" data-ex="${e}" aria-checked="${e===ex}">${SM(e,"smC")}${EXN[e]}</button>`).join('')}
  const sel=$('chips').querySelector('[aria-checked="true"]');if(sel)sel.scrollIntoView({block:'nearest',inline:'center'});
- const h=isH(ex),m=S.settings.lastMode[ex];$('pickTimer').hidden=!h;
+ const h=isH(ex),cam=hasCam(ex);let m=S.settings.lastMode[ex];if(m==='cam'&&!cam)m=h?'timer':'man';$('pickTimer').hidden=!h;$('pickCam').hidden=!cam;
  $('pickCam').querySelector('b').textContent=h?'Camera timer':'Count for me';
  $('pickCam').querySelector('small').textContent=h?'Say “start” / “done” — the camera also pauses the clock if you drop':'Prop your phone up — Buddy counts with the camera';
  $('pickMan').querySelector('small').textContent=h?'Hold it, then enter the time':'Do your set, then enter the number';
  $('pickTimer').classList.toggle('sel',m==='timer');$('pickCam').classList.toggle('sel',m==='cam');$('pickMan').classList.toggle('sel',m==='man');
- const c=window.BCount&&BCount.CFG[ex];$('pickTip').textContent=c&&c.tip?'Camera tip: '+c.tip:''}
+ const c=cam&&BCount.CFG[ex];$('pickTip').textContent=c&&c.tip?'Camera tip: '+c.tip:cam?'':(h?'No camera timer for this one yet — use the voice timer or enter your time.':'No camera counting for this one yet — log it by hand.')}
 $('chips').onclick=e=>{const b=e.target.closest('button[data-ex]');if(b){ex=b.dataset.ex;renderPick()}};
 $('pickTimer').onclick=()=>{S.settings.lastMode[ex]='timer';S.settings.lastEx=ex;save();goHold()};
 $('pickCam').onclick=()=>{S.settings.lastMode[ex]='cam';S.settings.lastEx=ex;save();goCam()};
@@ -214,8 +230,9 @@ function dialog(html,done){const d=$('dlg'),f=$('dlgF');f.innerHTML=html;f.query
 // ---------- settings ----------
 function settings(){const st=S.settings;
  dialog(`<h3>Goals & settings</h3>
- <p class="hint">Daily goals — 0 means no goal. Plank and dead hang are in seconds.</p>
- ${EXS.map(e=>`<label for="g_${e}">${EXN[e]}${isH(e)?' (seconds)':''}</label><input id="g_${e}" name="g_${e}" type="number" inputmode="numeric" min="0" max="${isH(e)?3600:1000}" value="${S.goals[e]}">`).join('')}
+ <button class="btn" type="button" id="chooseBtn" style="width:100%;margin:4px 0 10px">Choose exercises (${VIS().length} of ${EXS.length} shown)</button>
+ <p class="hint">Daily goals for the exercises on your home screen — 0 means no goal. Holds are in seconds.</p>
+ ${VIS().map(e=>`<label for="g_${e}">${EXN[e]}${isH(e)?' (seconds)':''}</label><input id="g_${e}" name="g_${e}" type="number" inputmode="numeric" min="0" max="${isH(e)?3600:1000}" value="${S.goals[e]}">`).join('')}
  <label for="aS">Camera timer: stop the hold when you drop</label><select id="aS" name="auto"><option value="1"${st.autoStop!==false?' selected':''}>On</option><option value="0"${st.autoStop===false?' selected':''}>Off — I'll say “done”</option></select>
  <p class="hint">Goals go up about 8% automatically after a week where you hit them on 4+ days.</p>
  <label for="rS">Rest timer between sets</label><select id="rS" name="rest">${[0,30,45,60,90,120].map(s=>`<option value="${s}"${s===st.rest?' selected':''}>${s?s+' seconds':'Off'}</option>`).join('')}</select>
@@ -225,12 +242,29 @@ function settings(){const st=S.settings;
  <div class="row"><button class="btn" value="">Cancel</button><button class="btn pri" value="ok">Save</button></div>
  <details class="hint"><summary>About reminders</summary>Phones only let web apps show a reminder while Buddy is open or, on Android with the app installed, occasionally in the background. iPhone web apps can’t schedule local reminders — use the Clock or Reminders app for a dependable nudge.</details>
  <div class="row"><button class="btn" value="export">Export my data</button><button class="btn" value="import">Import data</button><button class="btn danger" value="erase">Erase all data</button></div>`,(v,f)=>{
-  if(v==='ok'){for(const e of EXS){const g=Math.round(+f['g_'+e].value);if(g>=0)S.goals[e]=Math.min(isH(e)?3600:1000,g)}if(!GE().length)S.goals.pushups=50;st.autoStop=f.auto.value==='1';st.rest=+f.rest.value;st.units=f.units.value;
+  if(v==='ok'){for(const e of VIS()){if(!f['g_'+e])continue;const g=Math.round(+f['g_'+e].value);if(g>=0)S.goals[e]=Math.min(isH(e)?3600:1000,g)}if(!GE().length)S.goals[VIS()[0]]=isH(VIS()[0])?30:20;st.autoStop=f.auto.value==='1';st.rest=+f.rest.value;st.units=f.units.value;
    const had=st.remind;st.remind=f.rem.value||'';save();if(st.remind&&st.remind!==had)setupRemind(true);renderHome();toast('Saved')}
   else if(v==='export')exportJSON();
   else if(v==='import')importJSON();
   else if(v==='erase'){if(confirm('Erase every set, goal and body-log entry on this device? This cannot be undone.')){S=DEF();save();renderHome();toast('All data erased')}}})}
+document.addEventListener('click',e=>{if(e.target&&e.target.id==='chooseBtn'){const dl=e.target.closest('dialog');if(dl)dl.close();setTimeout(choose,0)}});
 $('gear').onclick=settings;$('ringBtn').onclick=settings;
+// ---------- choose exercises ----------
+function choose(){let V=VIS();
+ const row=e=>{const on=V.includes(e),i=V.indexOf(e);return `<div class="chRow${on?' on':''}">${SM(e,'smC')}<span class="chN">${EXN[e]}<small>${isH(e)?(hasCam(e)?'hold · camera timer':'hold · voice timer'):(hasCam(e)?'reps · camera counting':'reps · log by hand')}</small></span>${on?`<button type="button" class="chMv" data-up="${e}" aria-label="Move ${EXN[e]} earlier"${i===0?' disabled':''}>▲</button><button type="button" class="chMv" data-dn="${e}" aria-label="Move ${EXN[e]} later"${i===V.length-1?' disabled':''}>▼</button>`:''}<label class="sw"><input type="checkbox" data-ex="${e}"${on?' checked':''} aria-label="Show ${EXN[e]} on home"><i></i></label></div>`};
+ const body=()=>`<h3>Choose exercises</h3><p class="hint">Pick what shows on your home screen and in the picker. Hidden exercises keep their history, XP and muscle growth. ▲▼ sets the order.</p>
+  <p class="hint" id="chCount">${V.length} of ${EXS.length} shown</p>
+  ${CATS.map(([n,l],gi)=>`<div class="chG"><div class="chH"><b>${n}</b><span><button type="button" class="chA" data-all="${gi}">All</button><button type="button" class="chA" data-none="${gi}">None</button></span></div>${l.map(row).join('')}</div>`).join('')}
+  <div class="row"><button class="btn" type="button" data-reset="1">Reset to default</button><button class="btn pri" value="ok">Done</button></div>`;
+ dialog(body(),v=>{if(v!=='ok')return;S.settings.vis=V.slice();save();renderHome();toast(V.length+' exercises on your home screen')});
+ const dl=document.querySelector('dialog[open]');if(!dl)return;dl.classList.add('chooser');const f=dl.querySelector('form')||dl;
+ const paint=()=>{const y=dl.scrollTop;f.innerHTML=body();dl.scrollTop=y};
+ f.addEventListener('click',ev=>{const b=ev.target.closest('button,input');if(!b)return;const d=b.dataset;
+  if(d.up||d.dn){const e=d.up||d.dn,i=V.indexOf(e),j=d.up?i-1:i+1;if(j<0||j>=V.length)return;[V[i],V[j]]=[V[j],V[i]];paint();const nb=f.querySelector(`[data-${d.up?'up':'dn'}="${e}"]`);if(nb&&!nb.disabled)nb.focus();return}
+  if(d.all){for(const e of CATS[+d.all][1])if(!V.includes(e))V.push(e);paint();return}
+  if(d.none){const n=V.filter(e=>!CATS[+d.none][1].includes(e));if(!n.length){toast('Keep at least one exercise');return}V=n;paint();return}
+  if(d.reset){V=VIS0.slice();paint();return}
+  if(b.type==='checkbox'){const e=d.ex;if(b.checked){if(!V.includes(e))V.push(e)}else{if(V.length<=1){b.checked=true;toast('Keep at least one exercise');return}V=V.filter(x=>x!==e)}paint();const nb=f.querySelector(`input[data-ex="${e}"]`);if(nb)nb.focus()}})}
 function download(name,text,type){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type}));a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},500)}
 function importJSON(){const i=document.createElement('input');i.type='file';i.accept='application/json,.json';i.onchange=async()=>{try{const o=JSON.parse(await i.files[0].text());if(!o||o.v!==1||!Array.isArray(o.sets))throw 0;
  if(!confirm('Replace the data on this device with this file ('+o.sets.length+' sets)?'))return;localStorage.setItem(KEY,JSON.stringify(o));S=load();save();renderHome();toast('Data imported')}catch(e){toast('That file is not a Buddy export')}};i.click()}
@@ -289,8 +323,8 @@ function iosHint(){const ios=/iP(hone|ad|od)/.test(navigator.userAgent),sa=navig
 if('serviceWorker' in navigator&&location.protocol!=='file:'){navigator.serviceWorker.register('sw.js').then(()=>navigator.serviceWorker.ready).then(r=>{r.active&&r.active.postMessage('warm');setTimeout(checkOffline,4000)}).catch(()=>{})}
 async function checkOffline(){try{const c=await caches.open('buddy-mp-0.10.14');const ks=await c.keys();window.__offlineReady=ks.length>=6;if(ks.length<6)setTimeout(checkOffline,5000)}catch(e){}}
 // ---------- Buddy motivation: mood, tips, muscle levels, XP + outfits (all computed from local sets; small "seen" state in S.mot) ----------
-const XPR={pushups:1,squats:.8,situps:.7,pullups:3,jacks:.3,burpees:2.5,lunges:.9,calves:.3,plank:.5,deadhang:.5}; // per rep, or per second for holds
-const SECR={pushups:2.5,squats:2.5,situps:2.5,pullups:3.5,jacks:1,burpees:4,lunges:3,calves:1.5,plank:1,deadhang:1}; // ~seconds per rep (activity minutes)
+const XPR={pushups:1,squats:.8,situps:.7,pullups:3,jacks:.3,burpees:2.5,lunges:.9,calves:.3,plank:.5,deadhang:.5,kneepush:.7,wallpush:.4,sitstand:.6,glutes:.6,wallsit:.5,sideplank:.6,superman:.6,birddog:.6,climbers:.35,highknees:.3,march:.15,stepjacks:.25,chinups:3,scappulls:1,kneeraises:1.5,legraises:2.5}; // per rep, or per second for holds
+const SECR={pushups:2.5,squats:2.5,situps:2.5,pullups:3.5,jacks:1,burpees:4,lunges:3,calves:1.5,plank:1,deadhang:1,kneepush:2.5,wallpush:2.5,sitstand:3,glutes:2.5,wallsit:1,sideplank:1,superman:3,birddog:3,climbers:1,highknees:1,march:1,stepjacks:1.5,chinups:3.5,scappulls:2.5,kneeraises:3,legraises:3.5}; // ~seconds per rep (activity minutes)
 const SET_XP=5,xpNeed=n=>50*n*(n-1); // total XP to reach level n: L2 100, L3 300, L4 600, L5 1000 ...
 const OUTFITS=[['wrist','Wristbands',2,'wrist'],['shades','Sunglasses',3,'eyes'],['shorts','Blue shorts',4,'legs'],['gold','Gold headband',5,'band'],['gloves','Boxing gloves',6,'hands'],['redshorts','Red shorts',7,'legs'],['cape','Hero cape',8,'back'],['crown','Crown',10,'top']];
 const MGROUP={legs:['quads','glutes','hams','calves'],core:['abs','obliques'],'upper body':['chest','triceps','delts'],back:['lats','biceps','forearms']};
@@ -371,6 +405,7 @@ function tips(){const T=[],d=today(),y=addD(d,-1),st=streak(),x=totalXP(),L=lvOf
  for(const e of EXS.filter(isH)){const b=best(e),l=lastOf(e);if(b&&l&&l.reps<b)T.push(`${EXN[e]} day? Your last hold was ${b-l.reps} s off your best (${mmss(b)}).`);else if(b)T.push(`Your best ${EXL[e]} is ${mmss(b)}. Can you hold ${mmss(b+5)}?`)}
  const lastHit=ms=>{let t=0;for(const s of S.sets){const m=MUSC(s.ex);if(ms.some(k=>(m[k]||0)>=.8))t=Math.max(t,s.t)}return t};
  for(const g in MGROUP){const t=lastHit(MGROUP[g]);if(t){const n=Math.floor((pd(d)-pd(dk(t)))/864e5);if(n>=3)T.push(`You haven’t trained ${g} in ${n} days.`)}}
+ {const nt=EXS.filter(e=>!VIS().includes(e)&&!S.sets.some(s=>s.ex===e));if(nt.length>=3)T.push(`Want variety? ${nt.length} more exercises (like ${EXL[nt[0]]}) are in Settings › Choose exercises.`)}
  if(st>0)T.push(activeDay(d)?`🔥 ${st}-day streak — today is done!`:`🔥 ${st}-day streak — one set keeps it alive.`);
  for(const e of GE()){const g=S.goals[e],t=dayTot(e,d);if(t<g)T.push(isH(e)?`${mmss(g-t)} of ${EXL[e]} to hit today’s goal.`:`${g-t} ${EXL[e]} to hit today’s goal.`)}
  const wk=S.sets.filter(s=>dk(s.t)>addD(d,-7)).reduce((a,s)=>a+s.reps*(SECR[s.ex]||2),0)/60;

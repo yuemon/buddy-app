@@ -201,3 +201,23 @@ body.holdcam #cmGo{min-height:96px;font-size:34px}
 .wItem b{display:block;font-size:17px}.wItem small{font-size:14px;color:var(--ink2);font-weight:600}.wItem.on{border-color:var(--neon);background:#26313C}.wItem:disabled{opacity:.55;cursor:default}
 .mRow{display:grid;grid-template-columns:1fr auto 90px;gap:10px;align-items:center;font-size:16px;padding:7px 2px;border-bottom:1px solid var(--bd)}.mRow b{color:var(--neon)}.mRow i{height:10px;border-radius:5px;background:#26313C;overflow:hidden}.mRow u{display:block;height:100%;background:var(--neon)}
 @media (prefers-reduced-motion:reduce){#moodG,#zzz text,.armU{animation:none!important}.slot.home .m-happy #wrap:not(.flex) #rig>g[transform]>.armU,.slot.home .m-fresh #wrap:not(.flex) #rig>g[transform]>.armU{transform:rotate(140deg)}#bubble,.mBan,.xpTrack i{transition:none}}
+/* choose exercises */
+dialog.chooser{max-height:90vh;overflow:auto}
+.chG{margin:12px 0 4px}
+.chH{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--bd);padding-bottom:4px;margin-bottom:4px}
+.chH b{font-family:"Barlow Condensed",sans-serif;font-size:19px;text-transform:uppercase;letter-spacing:.03em}
+.chA{background:none;border:1.5px solid var(--bd);color:var(--ink);border-radius:10px;min-height:36px;padding:0 10px;margin-left:6px;font:inherit;font-size:14px}
+.chRow{display:flex;align-items:center;gap:8px;min-height:52px;opacity:.6}
+.chRow.on{opacity:1}
+.chRow .smC{width:34px;height:34px;flex:none}
+.chN{flex:1;font-weight:700;font-size:16px;line-height:1.15}
+.chN small{display:block;font-weight:400;font-size:12px;color:var(--ink2)}
+.chMv{background:none;border:1px solid var(--bd);color:var(--ink);border-radius:8px;width:34px;height:36px;font-size:12px;flex:none}
+.chMv:disabled{opacity:.25}
+dialog label.sw{position:relative;display:inline-block;width:50px;height:30px;margin:0;flex:none}
+dialog label.sw input{position:absolute;inset:0;opacity:0;width:100%;height:100%;min-height:0;margin:0;cursor:pointer;z-index:1}
+label.sw i{position:absolute;inset:0;border-radius:15px;background:#2A323C;transition:background .15s}
+label.sw i::after{content:"";position:absolute;left:3px;top:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:transform .15s}
+label.sw input:checked+i{background:var(--neon)}
+label.sw input:checked+i::after{transform:translateX(20px);background:#0B0D10}
+label.sw input:focus-visible+i{outline:3px solid #fff;outline-offset:2px}

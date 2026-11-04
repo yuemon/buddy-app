@@ -72,6 +72,37 @@ EXP.kneeraises={dur:KR.tot,reps:3,bar:22,hk:1,gen:krGen,prog:krPose,keys:[krGen(
 // dead hang: arms near-straight, hands fixed; breathing lifts/lowers the shoulders on the same vertical line, legs sway a degree or two as one rigid unit
 const dhGen=p=>{const w=Math.sin(p*Math.PI*2),sw=1.6*Math.sin(p*Math.PI*2+1.2);return hangPose({tor:182,rx:28,h:66.8+1.2*w,hdo:-3,L:[2+sw,2+sw],M:[5+sw,5+sw],ft:80,ft2:80})};
 EXP.deadhang={dur:2.0,reps:3,bar:22,hk:1,timer:1,gen:dhGen,keys:[dhGen(0),dhGen(.5)]};
+// ---- Buddy app extras
+// knee push-ups: knees on the floor, torso+thighs one straight line
+const kp=(tor,hands)=>Pz({tor,hd:tor-14,A:{iks:[0,hands]},B:{iks:[6,hands]},L:[tor-180,-90],M:[tor-177,-88],ft:-60});
+EXP.kneepush={dur:1.2,reps:3,keys:[kp(116,46),kp(105,27)]};
+// wall push-ups: hands fixed on a wall in front, body leans in as one line
+const wp=(tor,hx)=>Pz({hx,tor,hd:tor+4,A:{ikh:[85-hx,-54+(tor<155?-8:0)]},B:{ikh:[87-hx,-52+(tor<155?-8:0)]},L:[tor-180,tor-180],M:[tor-178,tor-178],ft:90});
+EXP.wallpush={dur:1.4,reps:3,wallX:93,keys:[wp(160,0),wp(150,16)]};
+// sit-to-stand: shallow squat to a seat, arms forward
+EXP.sitstand={dur:2.2,reps:2,keys:[stand({A:{ikh:[40,-40]},B:{ikh:[42,-40]}}),Pz({tor:150,hd:140,A:{ikh:[70,-30]},B:{ikh:[72,-28]},L:{ik:[48,48]},M:{ik:[46,48]}}),Pz({tor:160,hd:150,A:{ikh:[64,-34]},B:{ikh:[66,-32]},L:{ik:[50,48]},M:{ik:[48,48]}}),stand({A:{ikh:[40,-40]},B:{ikh:[42,-40]}})]};
+// side plank: high body on one forearm, top arm to the sky
+const spb=body(60);const sp=(dh)=>Pz({tor:spb.tor+dh,hd:spb.tor-8,A:[0,90],B:[178+dh,180+dh],L:[spb.leg[0]+dh,spb.leg[1]+dh],M:[spb.leg[0]+dh+2,spb.leg[1]+dh+2],ft:30});
+EXP.sideplank={dur:1.2,reps:3,elb:1,timer:1,keys:[sp(0),sp(-2),sp(0),sp(1.5)]};
+// bird dog: all fours, opposite arm + leg reach out, alternate sides
+const bd=(s)=>Pz({tor:109,hd:s?112:92,A:s===1?[96,96]:[0,0],B:s===2?[98,98]:[4,4],L:s===2?[-90,-90]:[0,-90],M:s===1?[-92,-92]:[3,-90],ft:-60,ft2:-60});
+EXP.birddog={dur:3.2,reps:2,keys:[bd(0),bd(1),bd(0),bd(2)]};
+// high knees / marching: alternate knees up, arms pump
+const hk=(n,lift)=>Pz({A:n?[-30,60]:[30,90],B:n?[30,90]:[-30,60],L:n?{ik:[lift*.95,100-lift*.95]}:[0,0],M:n?[3,3]:{ik:[lift*.95,100-lift*.95]},ft:90,jy:lift>40?8:0});
+EXP.highknees={dur:.6,reps:4,keys:[hk(1,52),hk(0,52)]};
+EXP.march={dur:1.1,reps:4,keys:[hk(1,30),stand(),hk(0,30),stand()]};
+// step jacks (front view): one leg steps out while the arms go overhead, no jump
+const sjA=Pz({A:[-5,-5],B:[5,5],L:[-3,-3],M:[3,3],ft:-90,ft2:90});
+EXP.stepjacks={dur:1.6,reps:3,front:1,keys:[sjA,Pz({A:[-160,-160],B:[160,160],L:[-22,-22],M:[3,3],ft:-90,ft2:90}),sjA,Pz({A:[-160,-160],B:[160,160],L:[-3,-3],M:[22,22],ft:-90,ft2:90})]};
+// chin-ups: same motion as pull-ups (palms toward you)
+EXP.chinups=Object.assign({},EXP.pullups,{keys:EXP.pullups.keys.slice()});
+// scapular pulls: arms stay long, shoulders pull down and back a few cm
+const scGen=p=>hangPose({tor:182,rx:28,h:68-9*eIO(p<.5?p*2:2-p*2),hdo:-3,L:[2,2],M:[5,5],ft:80,ft2:80});
+EXP.scappulls={dur:2.2,reps:3,bar:22,hk:1,gen:scGen,prog:u=>hangPose({tor:182,rx:28,h:68-9*u,hdo:-3,L:[2,2],M:[5,5],ft:80,ft2:80}),keys:[scGen(0),scGen(.5)]};
+// hanging leg raises: straight legs swing up to hip height
+const lrPose=u=>{const hip=-3+93*u;return hangPose({tor:183+5*u,rx:28,h:67,hdo:-3,L:[hip,hip],M:[hip+3,hip+3],ft:hip+85,ft2:hip+88})};
+const lrGen=p=>lrPose(krU(p));
+EXP.legraises={dur:KR.tot,reps:3,bar:22,hk:1,gen:lrGen,prog:lrPose,keys:[lrGen(0),lrGen(.4)]};
 // ---- forward kinematics
 const add=(a,b)=>[a[0]+b[0],a[1]+b[1]],sc=(a,k)=>[a[0]*k,a[1]*k];
 function fk(v,ex){
@@ -177,7 +208,7 @@ function draw(v,D){
   barCapL.setAttribute('y',by-11);barCapR.setAttribute('y',by-11);tmr.setAttribute('y',by+38);tmr.style.display=ex.timer?'':'none'}
  else barG.style.display='none';
  // wall prop
- wall.style.display=ex.wall!=null?'':'none';if(ex.wall!=null){wall.setAttribute('x',J.hN[0]+ox+ex.wall-16)}
+ wall.style.display=ex.wall!=null||ex.wallX!=null?'':'none';if(ex.wallX!=null)wall.setAttribute('x',ex.wallX+ox);else if(ex.wall!=null){wall.setAttribute('x',J.hN[0]+ox+ex.wall-16)}
  // side-profile muscles (bone-local shapes, morph flat->pumped, flare when worked)
  const segs={T:[J.hC,J.sC],TH:[J.hN,J.kN],SH:[J.kN,J.aN],UA:[J.sN,J.eN],FA:[J.eN,J.wN],THf:[J.hF,J.kF],SHf:[J.kF,J.aF],UAf:[J.sF,J.eF],FAf:[J.eF,J.wF]};
  const mode=ex.front?'front':'side';

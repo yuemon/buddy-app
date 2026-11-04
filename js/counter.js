@@ -96,6 +96,19 @@ var CFG={
   tip:'Phone ~2 m in front of the bar, hands, head and shoulders in view.',
   conds:[{need:['head','sh','wrist'],cond:function(F,S0){var W=F.mid('lw','rw'),g=(F.mid('ls','rs')[1]-W[1])/S0;return {on:g>.9&&W[1]<F.head()[1],v:g}}}]}
 };
+(function(){var X=function(b,o){return Object.assign({},CFG[b],o)};
+ CFG.kneepush=X('pushups',{name:'Knee Push-ups',tip:'Phone on the floor ~1.5 m to your side, head and shoulders in view.'});
+ CFG.sitstand=X('squats',{name:'Sit-to-Stand',tip:'Phone ~2 m away, a sturdy chair behind you, whole body in view.'});
+ CFG.chinups=X('pullups',{name:'Chin-ups',tip:'Phone ~2 m in front of the bar, head and shoulders in view. Palms facing you.'});
+ CFG.legraises=X('kneeraises',{name:'Hanging Leg Raises',what:'feet rising toward hip height (knees as backup)',tip:'Phone ~2.5 m away, hips and feet in view. Hang with legs straight down first.',sigs:[CFG.kneeraises.sigs[1],CFG.kneeraises.sigs[0]]});
+ var kl={n:'knee lift',need:['hip','knee'],dir:-1,prior:.8,hl:['lk','rk','lh','rh'],v:function(F){return [F.P('lk')[1]-F.P('lh')[1],F.P('rk')[1]-F.P('rh')[1]]}};
+ CFG.highknees={name:'High Knees',kind:'pair',unit:'reps',rel:'medium',hi:.6,lo:.3,period:.22,count:'peak',steady:.25,minCut:2.2,beta:1,grace:1.5,
+  what:'each knee rising toward hip height (each knee counts 1)',tip:'Phone ~2.5 m away, facing you, hips and knees in view.',sigs:[kl]};
+ CFG.march={name:'Marching',kind:'pair',unit:'steps',rel:'medium',hi:.6,lo:.3,period:.35,count:'peak',steady:.25,minCut:2.2,beta:1,grace:1.5,
+  what:'each knee lifting (each step counts 1)',tip:'Phone ~2.5 m away, facing you, hips and knees in view. Lift each knee a little.',sigs:[Object.assign({},kl,{prior:.45})]};
+ CFG.stepjacks={name:'Step Jacks',kind:'rep',unit:'reps',rel:'high',hi:.7,lo:.3,period:.5,count:'peak',steady:.15,minCut:2.5,beta:1,
+  what:'hands going overhead (feet step out, no jump)',tip:'Phone ~2.5 m away, room to spread your arms.',sigs:[CFG.jacks.sigs[1]]};
+})();
 Object.keys(CFG).forEach(function(k){var c=CFG[k];c.need=(c.sigs||c.conds)[0].need.reduce(function(a,g){return a.concat(GROUPS[g])},[])});
 
 function create(id,opt){

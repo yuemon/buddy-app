@@ -26,7 +26,7 @@ function dimNum(on){$('cmNum').classList.toggle('dim',on)}
 function cfg(){return BCount.CFG[id]}
 function tip(){const c=cfg();$('cmTip').innerHTML='<b>'+(REL[c.rel]||'')+'</b> · '+c.tip}
 function setUnit(){const c=cfg();$('cmUnit').textContent=c.kind==='hold'?'seconds':'reps';setNum(c.kind==='hold'?0:0);dimNum(true)}
-function fillSelect(){const s=$('cmEx');s.innerHTML=Engine.EX.map(e=>`<option value="${e.id}">${e.name}</option>`).join('');s.value=id}
+function fillSelect(){const s=$('cmEx');s.innerHTML=Engine.EX.filter(e=>BCount.CFG[e.id]).map(e=>`<option value="${e.id}">${e.name}</option>`).join('');s.value=id}
 function status(cls,txt){pv.classList.remove('ok','lost');if(cls)pv.classList.add(cls);$('pvSt').textContent=txt}
 // ---------- model + camera ----------
 function loadModel(){

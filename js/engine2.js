@@ -4,6 +4,17 @@ const MUSCLES=[['traps','Neck & traps'],['delts','Shoulders'],['chest','Chest'],
 const NAME=Object.fromEntries(MUSCLES);
 const ALL=Object.fromEntries(MUSCLES.map(([k])=>[k,.5]));
 const EX=[
+ {id:'kneepush',name:'Knee Push-ups',m:{chest:.8,triceps:.8,delts:.4}},
+ {id:'wallpush',name:'Wall Push-ups',m:{chest:.5,triceps:.5,delts:.3}},
+ {id:'sitstand',name:'Sit-to-Stand',m:{quads:.8,glutes:.8,hams:.2}},
+ {id:'sideplank',name:'Side Plank',m:{obliques:1,abs:.5,delts:.4,glutes:.3}},
+ {id:'birddog',name:'Bird Dog',m:{lowback:.8,glutes:.6,abs:.5,delts:.3}},
+ {id:'highknees',name:'High Knees',m:{quads:.6,abs:.4,calves:.6}},
+ {id:'march',name:'Marching',m:{quads:.4,calves:.4,abs:.2}},
+ {id:'stepjacks',name:'Step Jacks',m:{delts:.6,calves:.5,traps:.2}},
+ {id:'chinups',name:'Chin-ups',m:{biceps:1,lats:1,forearms:.5}},
+ {id:'scappulls',name:'Scapular Pulls',m:{lats:.6,traps:1,forearms:.6}},
+ {id:'legraises',name:'Hanging Leg Raises',m:{abs:1,obliques:.6,forearms:.4,quads:.3}},
  {id:'pushups',name:'Push-ups',m:{chest:1,triceps:1,delts:.5}},
  {id:'squats',name:'Squats',m:{quads:1,glutes:1,hams:.3}},
  {id:'lunges',name:'Lunges',m:{quads:1,glutes:.8,hams:.8}},
