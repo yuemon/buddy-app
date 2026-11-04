@@ -241,3 +241,31 @@ label.sw input:focus-visible+i{outline:3px solid #fff;outline-offset:2px}
 @media (max-width:370px){#tiles .tile .tn{font-size:12.5px}#tiles .tile .tv{font-size:28px}#tiles .smT{width:28px;height:28px}#tiles .tile{padding:6px}}
 @media (min-width:600px){.tgG{grid-template-columns:repeat(4,minmax(0,1fr))}}
 body.app{padding-bottom:calc(96px + env(safe-area-inset-bottom))}
+/* ===== Task F: one-screen exercise picker (Buddy / modes / grouped grid) ===== */
+#s-pick:not([hidden]){display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden;padding-bottom:calc(6px + env(safe-area-inset-bottom))}
+body.app:has(#s-pick:not([hidden])){padding-bottom:0}
+#s-pick .top{min-height:48px;padding-top:calc(env(safe-area-inset-top) + 4px);padding-bottom:2px;flex:none}
+#pTitle{font-size:22px}#pTitle .smH{width:30px;height:30px}
+.slot.pick{flex:1 1 auto;min-height:140px;position:relative}
+.slot.pick .stage{height:100%}
+.slot.pick .stage>button{display:none!important}
+.pInfo{display:flex;gap:14px;justify-content:center;align-items:baseline;font-size:15px;color:var(--ink2);font-weight:600;margin:5px 0 4px;flex:none}
+.pInfo b{color:var(--ink);font-size:17px}
+.pModes{display:flex;gap:6px;flex:none;margin:0 0 6px}
+#s-pick .huge{flex:1 1 0;display:flex;flex-direction:row;align-items:center;justify-content:center;gap:6px;min-height:52px!important;height:auto;margin:0!important;padding:4px 6px!important;border-radius:14px;width:auto}
+#s-pick .huge[hidden]{display:none!important}
+#s-pick .huge small,#s-pick .huge .last{display:none}
+#s-pick .huge .em{font-size:20px;margin:0}#s-pick .huge b{font-size:15.5px;line-height:1.1;text-align:center}
+#s-pick .huge.sel{border-color:var(--neon)}
+.pSel{flex:none}
+.pG h3{margin:3px 2px 2px;font:800 10.5px/1.1 "Barlow",sans-serif;letter-spacing:.07em;text-transform:uppercase;color:var(--ink2)}
+.pGrid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:3px}
+.pIt{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-height:46px;min-width:0;padding:3px 1px;border-radius:10px;border:1.5px solid var(--bd);background:var(--card);color:var(--ink2);cursor:pointer}
+.pIt .smI{width:26px;height:26px}
+.pIt span{font-size:10px;line-height:1.05;font-weight:700;text-align:center;width:100%;overflow-wrap:anywhere}
+.pIt[aria-checked=true]{border:2.5px solid var(--c);background:color-mix(in srgb,var(--c) 26%,#141A20);color:#fff;box-shadow:0 0 0 2px color-mix(in srgb,var(--c) 35%,transparent),0 0 10px color-mix(in srgb,var(--c) 45%,transparent)}
+#s-pick[data-n=m] .pGrid{grid-template-columns:repeat(5,minmax(0,1fr));gap:4px}
+#s-pick[data-n=m] .pIt{min-height:54px}#s-pick[data-n=m] .pIt .smI{width:30px;height:30px}#s-pick[data-n=m] .pIt span{font-size:11.5px}
+#s-pick[data-n=s] .pGrid{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
+#s-pick[data-n=s] .pIt{min-height:60px;border-radius:12px}#s-pick[data-n=s] .pIt .smI{width:32px;height:32px}#s-pick[data-n=s] .pIt span{font-size:12.5px}
+#s-pick[data-n=s] .pG h3{font-size:11.5px}

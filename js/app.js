@@ -88,6 +88,7 @@ function show(name,push=true){
  if(cur==='cam'&&name!=='cam'&&(CAMM.running)){camActive=false;CAMM.stop(true)}
  if(cur==='hold'&&name!=='hold'){hMode='off';clearInterval(hI);hUnlisten()}
  if(name!=='rest')stopRest();if(name!=='log')stopInlineRest();
+ if(cur==='pick'&&name!=='pick')pStop();
  cur=name;qa('.scr').forEach(s=>s.hidden=s.id!=='s-'+name);
  document.body.classList.toggle('nonav',!(name==='home'||name==='stats'));
  qa('.bnav button').forEach(b=>b.toggleAttribute('aria-current',b.dataset.go===name));
@@ -115,15 +116,25 @@ function renderHome(){place('slotHome');syncBuddy();const d=today(),st=streak();
 $('tiles').onclick=e=>{const b=e.target.closest('.tile');if(b){ex=b.dataset.ex;show('pick')}};
 $('startBtn').onclick=()=>{const d=today(),G=GE(),f=e=>dayTot(e,d)/S.goals[e];const L=G.filter(e=>f(e)<1).sort((a,b)=>f(a)-f(b));const V=VIS();ex=L[0]||(V.includes(S.settings.lastEx)?S.settings.lastEx:V[0]);show('pick')};
 // ---------- 2. picker ----------
-function renderPick(){$('pTitle').innerHTML=SM(ex,'smH')+EXN[ex];
- {const V=VIS();if(!V.includes(ex))V.unshift(ex);$('chips').innerHTML=V.map(e=>`<button role="radio" data-ex="${e}" aria-checked="${e===ex}">${SM(e,"smC")}${EXN[e]}</button>`).join('')}
- const sel=$('chips').querySelector('[aria-checked="true"]');if(sel)sel.scrollIntoView({block:'nearest',inline:'center'});
+const catOf=e=>(CATS.find(c=>c[1].includes(e))||['Other'])[0];
+let pRaf=0;
+function pAnim(){cancelAnimationFrame(pRaf);if(RM)return;try{Rig.wrap.classList.add('flip');Perf.enter(ex)}catch(e){return}const E=Perf.EXP[ex],t0=performance.now(),me=ex;
+ const f=n=>{if(cur!=='pick'||ex!==me)return;try{Perf.draw(Perf.poseAt(E,((n-t0)/1000)/(E.dur||2)),Engine.D)}catch(e){}pRaf=requestAnimationFrame(f)};pRaf=requestAnimationFrame(f)}
+function pStop(){cancelAnimationFrame(pRaf);pRaf=0;try{if(Perf.cur)Perf.leave()}catch(e){}}
+function renderPick(){$('pTitle').innerHTML=SM(ex,'smH')+EXN[ex];place('slotPick');
+ {const V=VIS();if(!V.includes(ex))V.unshift(ex);const seen=new Set(),G=CATS.map(([n,l])=>[n,V.filter(e=>l.includes(e))]);G.forEach(g=>g[1].forEach(e=>seen.add(e)));const r=V.filter(e=>!seen.has(e));if(r.length)G.push(['Other',r]);
+  const n=V.length,sec=$('s-pick');sec.dataset.n=n>18?'l':n>11?'m':'s';
+  $('chips').innerHTML=G.filter(g=>g[1].length).map(([c,l])=>`<div class="pG" role="group" aria-label="${c}"><h3>${c}</h3><div class="pGrid">${l.map(e=>`<button role="radio" class="pIt" data-ex="${e}" aria-checked="${e===ex}" style="--c:${COL[e]}">${SM(e,'smI')}<span>${EXN[e]}</span></button>`).join('')}</div></div>`).join('')}
+ {const b=best(ex),d=dayTot(ex,today()),g=S.goals[ex];$('pInfo').innerHTML=`<span>Today <b>${fmt(ex,d)}</b>${g?' / '+fmt(ex,g):''}</span><span>${isH(ex)?'Longest':'Best set'} <b>${b?fmt(ex,b):'–'}</b></span>`}
  const h=isH(ex),cam=hasCam(ex);let m=S.settings.lastMode[ex];if(m==='cam'&&!cam)m=h?'timer':'man';$('pickTimer').hidden=!h;$('pickCam').hidden=!cam;
  $('pickCam').querySelector('b').textContent=h?'Camera timer':'Count for me';
  $('pickCam').querySelector('small').textContent=h?'Say “start” / “done” — the camera also pauses the clock if you drop':'Prop your phone up — Buddy counts with the camera';
  $('pickMan').querySelector('small').textContent=h?'Hold it, then enter the time':'Do your set, then enter the number';
  $('pickTimer').classList.toggle('sel',m==='timer');$('pickCam').classList.toggle('sel',m==='cam');$('pickMan').classList.toggle('sel',m==='man');
- const c=cam&&BCount.CFG[ex];$('pickTip').textContent=c&&c.tip?'Camera tip: '+c.tip:cam?'':(h?'No camera timer for this one yet — use the voice timer or enter your time.':'No camera counting for this one yet — log it by hand.')}
+ const c=cam&&BCount.CFG[ex];$('pickTip').textContent=c&&c.tip?'Camera tip: '+c.tip:cam?'':(h?'No camera timer for this one yet — use the voice timer or enter your time.':'No camera counting for this one yet — log it by hand.');
+ $('pickMan').querySelector('b').textContent=isH(ex)?'Enter time':'Log it myself';
+ for(const k of ['pickCam','pickTimer','pickMan'])$(k).title=$(k).querySelector('small').textContent;
+ pAnim();scrollTo(0,0)}
 $('chips').onclick=e=>{const b=e.target.closest('button[data-ex]');if(b){ex=b.dataset.ex;renderPick()}};
 $('pickTimer').onclick=()=>{S.settings.lastMode[ex]='timer';S.settings.lastEx=ex;save();goHold()};
 $('pickCam').onclick=()=>{S.settings.lastMode[ex]='cam';S.settings.lastEx=ex;save();goCam()};
