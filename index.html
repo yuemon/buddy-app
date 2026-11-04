@@ -18,21 +18,19 @@
  <header class="top"><h1 id="hTitle">Buddy<em>.</em></h1><div class="streak" id="streak" aria-label="Streak">🔥 0 days</div><button class="icon" id="gear" aria-label="Settings">⚙︎</button></header>
  <div class="slot home" id="slotHome"></div>
  <div class="goalRow">
-  <button class="ringBtn" id="ringBtn" aria-label="Daily goal progress. Tap to change goals"><svg viewBox="0 0 120 120" class="gring" aria-hidden="true"><circle cx="60" cy="60" r="50" class="rt"/><circle cx="60" cy="60" r="50" class="rp" id="ringP"/><circle cx="60" cy="60" r="38" class="rt t2"/><circle cx="60" cy="60" r="38" class="rp p2" id="ringS"/></svg>
+  <button class="ringBtn" id="ringBtn" aria-label="Daily goal progress. Tap to change goals"><svg viewBox="0 0 120 120" class="gring" aria-hidden="true"><circle cx="60" cy="60" r="50" class="rt"/><circle cx="60" cy="60" r="50" class="rp" id="ringP"/></svg>
    <span class="ringTxt"><b id="ringPct">0%</b><small>of today's goal</small></span></button>
   <div class="goalTxt" id="goalTxt"></div>
  </div>
- <div class="tiles">
-  <button class="tile" data-ex="pushups" id="tPush"><span class="tn"><i class="dot pu"></i>Push-ups</span><b class="tv">0</b><span class="tg">of 50 today</span><span class="tb">Best set: –</span></button>
-  <button class="tile" data-ex="squats" id="tSquat"><span class="tn"><i class="dot sq"></i>Squats</span><b class="tv">0</b><span class="tg">of 50 today</span><span class="tb">Best set: –</span></button>
- </div>
+ <div class="tiles" id="tiles"></div>
  <button class="cta" id="startBtn">Start workout</button>
  <p class="small" id="homeNote"></p>
 </section>
 <!-- 2. Picker -->
 <section class="scr" id="s-pick" hidden aria-labelledby="pTitle">
  <header class="top sub"><button class="back" data-go="home" aria-label="Back to today">‹ Back</button><h2 id="pTitle">Push-ups</h2></header>
- <div class="seg" role="radiogroup" aria-label="Exercise"><button role="radio" data-ex="pushups" aria-checked="true">Push-ups</button><button role="radio" data-ex="squats" aria-checked="false">Squats</button></div>
+ <div class="chips" id="chips" role="radiogroup" aria-label="Exercise"></div>
+ <button class="huge" id="pickTimer" hidden><span class="em" aria-hidden="true">⏱</span><b>Voice timer</b><small>Say “start” to begin, “done” to stop. No camera needed</small><i class="last">Last used</i></button>
  <button class="huge" id="pickCam"><span class="em" aria-hidden="true">📷</span><b>Count for me</b><small>Prop your phone up — Buddy counts with the camera</small><i class="last">Last used</i></button>
  <button class="huge" id="pickMan"><span class="em" aria-hidden="true">✍️</span><b>Log it myself</b><small>Do your set, then enter the number</small><i class="last">Last used</i></button>
  <p class="small" id="pickTip"></p>
@@ -51,11 +49,19 @@
   <output id="repOut" aria-live="polite">10</output>
   <button class="stp" id="plus" aria-label="One more">+</button>
  </div>
- <div class="quick"><button class="btn" data-d="-5">−5</button><span>reps</span><button class="btn" data-d="5">+5</button></div>
+ <div class="quick"><button class="btn" data-d="-5">−5</button><span id="quickU">reps</span><button class="btn" data-d="5">+5</button></div>
  <button class="cta" id="addSet">Add set</button>
  <div class="rest" id="restBox" hidden><div><b id="restNum">60</b><small>rest</small></div><button class="btn" id="restSkip">Skip</button><button class="btn" id="restAdd">+15 s</button></div>
  <h3 class="lh">Today's sets <small>tap to edit</small></h3>
  <ol class="sets" id="setList"></ol>
+</section>
+<!-- 4b. Hold timer -->
+<section class="scr" id="s-hold" hidden aria-labelledby="hdTitle">
+ <header class="top sub"><button class="back" id="holdBack" aria-label="Back">‹ Back</button><h2 id="hdTitle">Plank</h2><span class="pill" id="holdToday">0:00</span></header>
+ <button class="holdFace" id="holdFace" aria-live="polite"><b id="holdNum">0:00</b><span id="holdSay">Say “START”</span><small id="holdSub">or tap here to start</small></button>
+ <p class="small" id="holdMic"></p>
+ <p class="holdBest" id="holdBest"></p>
+ <button class="cta stopBig" id="holdStop" hidden>STOP</button>
 </section>
 <!-- 5. Set complete -->
 <section class="scr" id="s-done" hidden aria-labelledby="dTitle">

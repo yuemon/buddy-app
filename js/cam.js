@@ -11,7 +11,7 @@ const RMQ=Engine.RM;
 const voice=BVoice.create();
 let mode='off',vsOn=true,rec=null,recWant=false,recOK=false,micDenied=false,lastCmdT=0,handT=0,arT=0.75,ignoreUntil=0,
  open=false,running=false,id='pushups',lastTap=null,landmarker=null,loading=null,stream=null,raf=0,counter=null,L=null,sess=null,lastVT=-1,wake=null,
- muted=false,audio=null,readyT=0,tok=0,lastHold=0,lastBeepRep=0,ready=false,hintTxt='',lostSince=0,starting=false,shown=0;
+ muted=false,audio=null,readyT=0,tok=0,lastHold=0,holdSeenT=0,holdSeenS=0,pbSaid=0,lastBeepRep=0,ready=false,hintTxt='',lostSince=0,starting=false,shown=0;
 try{muted=localStorage.getItem('buddyMute')==='1';vsOn=localStorage.getItem('buddyVoiceStart')!=='0'}catch(e){}
 const vd=document.querySelector('#pv video'),cv=document.querySelector('#pv canvas'),pv=$('pv');
 // ---------- sound + haptics ----------
@@ -130,7 +130,7 @@ function enterWait(again){mode='wait';handT=0;counter=null;dimNum(true);status('
  setHint(lis?'Get into position, then say “start”.':'Get into position, then tap the screen or raise a hand.','');
  voice.say(lis?'Get into position, then say start.':'Get into position, then tap the screen, or raise one hand above your head to start.',{force:true});
  if(lis&&!again)recStart();else micUI()}
-function arm(spoken){counter=BCount.create(id,{ar:arT});mode='run';ready=false;showWait(false);dimNum(true);
+function arm(spoken){counter=BCount.create(id,{ar:arT});holdSeenT=0;pbSaid=0;lastHold=0;mode='run';ready=false;showWait(false);dimNum(true);
  if(spoken!==false)voice.say('Hold still',{force:true});if(vsOn&&canListen()&&!recWant)recStart()}
 function pauseSet(){mode='paused';showWait(true,'Paused','say “resume” or tap to carry on');voice.say('Paused',{force:true});status('','Paused')}
 function resumeSet(){mode='run';showWait(false);voice.say('Go',{force:true})}
@@ -163,7 +163,7 @@ function loop(){
   else if(isHold&&!o.holding){status('','Paused');setHint(o.hint||'Get into position — timer paused','warn')}
   else{status('ok',isHold?'Hold':'Live');if(o.hint&&o.hint!=='Go!')setHint(o.hint,'warn');else if(t-readyT>3||hintTxt.indexOf('|warn')>-1)setHint(isHold?'Holding — keep it steady':'Tracking you — keep going!','ok')}
  }
- if(isHold){const s=Math.floor(o.hold);setNum(s,false);if(s>=10&&s%10===0&&s!==lastHold){lastHold=s;tone(1047,.14,0);tone(1397,.18,.1);vib([30,30,50]);$('cmSr').textContent=s+' seconds'}}
+ if(isHold){const s=Math.floor(o.hold);setNum(s,false);const H=window.BuddyHooks||{};if(o.holding){holdSeenT=t;holdSeenS=o.hold}else if(ready&&H.autoStop&&H.autoStop()&&s>=5&&holdSeenT&&t-holdSeenT>4){holdSeenT=0;L.hold=holdSeenS;voice.say('You dropped — saving your hold.',{force:true});stop(true);return}const pb=H.best?H.best(id):0;if(pb>0&&!pbSaid&&s>pb){pbSaid=1;voice.say('New best!',{force:true});H.onNewBest&&H.onNewBest(s)}else if(s>=10&&s%10===0&&s!==lastHold){lastHold=s;tone(1047,.14,0);tone(1397,.18,.1);vib([30,30,50]);voice.say(s%60===0?(s/60)+(s===60?' minute':' minutes'):s+' seconds',{force:true});$('cmSr').textContent=s+' seconds'}}
  else{setNum(o.reps,o.counted);if(o.counted){beepRep(o.reps);const pb=window.BuddyHooks&&BuddyHooks.best?BuddyHooks.best(id):0;if(pb>0&&o.reps===pb+1){voice.say('New best!',{force:true});window.BuddyHooks.onNewBest&&BuddyHooks.onNewBest(o.reps)}else if(o.reps%5===0)voice.say(o.reps+' reps',{force:true});$('cmSr').textContent=o.reps+(o.reps===1?' rep':' reps')}}
 }
 // ---------- open / close ----------

@@ -1,5 +1,5 @@
 // Buddy service worker: app shell precached at install; pose model + wasm cached right after (best effort) so tracking works offline.
-const VER='4858d8a304',SHELL_C='buddy-shell-'+VER,MP_C='buddy-mp-0.10.14',STATE_C='buddy-state';
+const VER='83c6ca928b',SHELL_C='buddy-shell-'+VER,MP_C='buddy-mp-0.10.14',STATE_C='buddy-state';
 const SHELL=["./", "index.html", "manifest.webmanifest", "css/ui.css", "css/ui2.css", "css/cam.css", "css/app.css", "fonts/fonts.css", "fonts/Barlow-500.woff2", "fonts/Barlow-600.woff2", "fonts/Barlow-700.woff2", "fonts/BarlowCondensed-600.woff2", "fonts/BarlowCondensed-700.woff2", "fonts/BarlowCondensed-800.woff2", "js/icons.js", "js/muscles.js", "js/engine2.js", "js/rig.js", "js/perf.js", "js/ctrl.js", "js/counter.js", "js/voice.js", "js/cam.js", "js/app.js", "icons/apple-touch-icon.png", "icons/icon-192.png", "icons/icon-512.png", "icons/maskable-512.png"];
 const MP=['mp/vision_bundle.mjs','mp/pose_landmarker_lite.task','mp/wasm/vision_wasm_internal.js','mp/wasm/vision_wasm_internal.wasm','mp/wasm/vision_wasm_nosimd_internal.js','mp/wasm/vision_wasm_nosimd_internal.wasm'];
 async function warmMP(){const c=await caches.open(MP_C);for(const u of MP){if(!(await c.match(u))){try{const r=await fetch(u,{cache:'no-cache'});if(r.ok)await c.put(u,r)}catch(e){}}}}

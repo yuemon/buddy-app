@@ -292,8 +292,8 @@ function create(id,opt){
  function calibrate(F,t,dt,o,first){
   S.posT+=dt;var cs=S.cs,buf=S.calBuf;
   buf.push({t:t,r:cs.map(function(c){return c.avail?c.raw.slice():null}),S:S.Sz,a:first});
-  while(buf.length&&t-buf[0].t>.9)buf.shift();
-  var span=buf[buf.length-1].t-buf[0].t,steady=buf.length>=6,k,sc=S.Sz;
+  while(buf.length>6&&t-buf[0].t>.9||buf.length&&t-buf[0].t>1.3)buf.shift();
+  var span=buf[buf.length-1].t-buf[0].t,steady=buf.length>=4,k,sc=S.Sz;
   for(k=0;k<nch&&steady;k++){var arr=[],i;for(i=0;i<buf.length;i++){var r=buf[i].r[first];if(!r){steady=false;break}arr.push(r[k])}
    if(!steady)break;
    var scc=cs[first].cd.abs?1:sc,n=arr.length,h=n>>1,m1=0,m2=0;for(i=0;i<h;i++)m1+=arr[i];for(i=h;i<n;i++)m2+=arr[i];m1/=Math.max(1,h);m2/=Math.max(1,n-h);
@@ -303,7 +303,7 @@ function create(id,opt){
   if(span>=.75&&steady){
    var S0=median(buf.map(function(b){return b.S}));
    for(var j=0;j<cs.length;j++){var ok=true,rs=[];for(k=0;k<nch;k++){var col=[];for(var q=0;q<buf.length;q++){var rr=buf[q].r[j];if(!rr){ok=false;break}col.push(rr[k])}if(!ok)break;rs.push(median(col))}
-    if(ok&&buf.length>=6){cs[j].rest=nch===2?rs:[rs[0],0];cs[j].ready=true;cs[j].f=[];cs[j].peak=[0,0]}}
+    if(ok&&buf.length>=4){cs[j].rest=nch===2?rs:[rs[0],0];cs[j].ready=true;cs[j].f=[];cs[j].peak=[0,0]}}
    var cd=cs[first].cd,r0=cs[first].rest[0]/ (cd.abs?1:S0);
    if(cd.restMin!=null&&Math.abs(r0)<cd.restMin){S.hint='Hang straight with your knees down, then hold still';S.calBuf=[];cs[first].ready=false;return out(o)}
    S.S0=S0;S.phase='go';S.hint='Go!';S.calBuf=[];S.tLast=t-.2;S.act=-1;S.M=[mkM(),mkM()];S.actGap=0;

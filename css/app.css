@@ -137,3 +137,19 @@ dialog .btn.danger{color:var(--bad);border-color:var(--bad)}
 #toast.on{transform:translate(-50%,0)}
 @media (prefers-reduced-motion:reduce){#toast,.gring .rp{transition:none}}
 [hidden]{display:none!important}
+/* v2: 10 exercises */
+.tiles{grid-template-columns:1fr 1fr;gap:8px}
+.tile{min-height:0!important;padding:10px 12px;border-radius:16px}
+.tile .tn{font-size:17px}.tile .tv{font-size:42px;color:var(--c,var(--neon))!important}
+.tile .tg,.tile .tb{font-size:14px}.tile .tb{margin-top:0}
+.tile .dot{background:var(--c)}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:4px 2px 10px;margin:0 0 6px;scrollbar-width:none}
+.chips button{flex:none;min-height:48px;padding:0 14px;border-radius:24px;border:2px solid var(--bd);background:var(--card);color:var(--ink2);font-weight:700;font-size:17px;cursor:pointer}
+.chips button[aria-checked="true"]{color:var(--ink);border-color:var(--neon);background:#26313C}
+.holdFace{display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;min-height:340px;margin:10px 0;border-radius:28px;border:3px solid var(--bd);background:var(--card);color:var(--ink);cursor:pointer}
+.holdFace b{font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:120px;line-height:1;color:var(--neon)}
+.holdFace span{font-size:30px;font-weight:800;margin-top:8px}.holdFace small{font-size:17px;color:var(--ink2);margin-top:6px}
+.holdFace.run{border-color:var(--neon)}
+.holdBest{text-align:center;font-size:19px;font-weight:700;min-height:24px}
+.stopBig{min-height:110px!important;font-size:40px!important;background:var(--bad)!important;color:#fff!important}
+body.holdcam #cmGo{min-height:96px;font-size:34px}
