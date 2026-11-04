@@ -28,7 +28,7 @@ EXP.squats={dur:1.5,reps:3,keys:[stand({A:[8,12]}),Pz({tor:140,hd:128,A:{iks:[64
 const lunge=(front)=>Pz({tor:178,A:{ikh:[10,-3]},B:{ikh:[10,-3]},L:front?{ik:[44,52]}:{ik:[-50,46]},M:front?{ik:[-50,46]}:{ik:[44,52]},ft:front?90:20,ft2:front?20:90});
 EXP.lunges={dur:2.6,reps:2,keys:[stand({A:{ikh:[10,-3]},B:{ikh:[10,-3]}}),lunge(true),stand({A:{ikh:[10,-3]},B:{ikh:[10,-3]}}),lunge(false)]};
 // ---- plank (forearms) with a little wobble
-const pb=body(49);const plk=(dh,dl)=>Pz({tor:pb.tor+dh,hd:pb.tor-12,A:[0,90],B:[0,92],L:[pb.leg[0]+dl,pb.leg[1]+dl],M:[pb.leg[0]+dl,pb.leg[1]+dl],ft:30});
+const pb=body(49);const plk=(dh,dl)=>Pz({tor:pb.tor+dh,hd:pb.tor+6,A:[0,90],B:[0,92],L:[pb.leg[0]+dl,pb.leg[1]+dl],M:[pb.leg[0]+dl,pb.leg[1]+dl],ft:30});
 EXP.plank={dur:1.1,reps:3,elb:1,keys:[plk(0,0),plk(-2,-2.5),plk(0,0),plk(1.5,2)]};
 // ---- sit-ups
 EXP.situps={dur:1.5,reps:3,lie:1,hk:1,keys:[Pz({tor:270,hd:246,A:[92,92],B:[96,96],L:{ik:[56,4]},M:{ik:[58,4]}}),Pz({tor:165,hd:150,A:{ikh:[36,-36]},B:{ikh:[38,-34]},L:{ik:[56,4]},M:{ik:[58,4]}})]};
@@ -74,8 +74,9 @@ const dhGen=p=>{const w=Math.sin(p*Math.PI*2),sw=1.6*Math.sin(p*Math.PI*2+1.2);r
 EXP.deadhang={dur:2.0,reps:3,bar:22,hk:1,timer:1,gen:dhGen,keys:[dhGen(0),dhGen(.5)]};
 // ---- Buddy app extras
 // knee push-ups: knees on the floor, torso+thighs one straight line
-const kp=(tor,hands)=>Pz({tor,hd:tor-14,A:{iks:[0,hands]},B:{iks:[6,hands]},L:[tor-180,-90],M:[tor-177,-88],ft:-60});
-EXP.kneepush={dur:1.2,reps:3,keys:[kp(116,46),kp(105,27)]};
+const kp=tor=>{const h=(TOL+THL)*-Math.cos(tor*d2r)-3;return Pz({tor,hd:tor-2,A:{iks:[2,h]},B:{iks:[8,h]},L:[tor-180,-90],M:[tor-177,-88],ft:-60})};
+// knees on the floor, one straight line knee->shoulder, hands under the shoulders (arms vertical at the top)
+EXP.kneepush={dur:1.2,reps:3,keys:[kp(126),kp(106)]};
 // wall push-ups: hands fixed on a wall in front, body leans in as one line
 const wp=(tor,hx)=>Pz({hx,tor,hd:tor+4,A:{ikh:[85-hx,-54+(tor<155?-8:0)]},B:{ikh:[87-hx,-52+(tor<155?-8:0)]},L:[tor-180,tor-180],M:[tor-178,tor-178],ft:90});
 EXP.wallpush={dur:1.4,reps:3,wallX:93,keys:[wp(160,0),wp(150,16)]};
@@ -114,7 +115,7 @@ function fk(v,ex){
  const tN=add(aN,sc(dir(ft),14)),tF=add(aF,sc(dir(ft2),14));
  const hdN=add(front?add(H0,T):sN,sc(dir(hd),HEADD));
  let low=Math.max(wN[1]+9,wF[1]+9,aN[1]+6,aF[1]+6,tN[1]+5,tF[1]+5);
- if(ex.lie)low=Math.max(low,sN[1]+11,hN[1]+11,hdN[1]+29);
+ if(ex.lie)low=Math.max(low,sN[1]+11,hN[1]+11,hdN[1]+34);
  if(ex.elb)low=Math.max(low,eN[1]+9);
  let dy=GY-low-jy,dx=0;
  if(ex.bar!=null&&hgw>0){const w=hgw<0?0:hgw>1?1:hgw;dy=dy+(ex.bar-wN[1]-dy)*w;dx=-wN[0]*w}   // hanging: hands pinned to the bar

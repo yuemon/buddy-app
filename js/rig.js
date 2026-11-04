@@ -28,7 +28,6 @@ face.innerHTML=`
  <path data-f="mok" class="fx" d="M90 76Q100 84 110 76" fill="none" stroke="#1B2A06" stroke-width="4" stroke-linecap="round"/>
  <g data-f="mhappy" class="fx"><path d="M86 73Q100 92 114 73Z" fill="#1B2A06" stroke="#1B2A06" stroke-width="3" stroke-linejoin="round"/><path d="M93 82Q100 88 107 82Q100 78 93 82Z" fill="#FF6F8D"/></g>
  <g data-f="mgrr" class="fx"><rect x="88" y="73" width="24" height="10" rx="4" fill="#fff" stroke="#1B2A06" stroke-width="3"/><path d="M94 73V83M100 73V83M106 73V83" stroke="#1B2A06" stroke-width="2"/></g>
- <g data-f="cheek" class="fx"><circle cx="74" cy="74" r="6" fill="#FF6F8D" opacity=".6"/><circle cx="126" cy="74" r="6" fill="#FF6F8D" opacity=".6"/></g>
  <path data-f="sweat" class="fx on sweat" d="M133 52q-6 9 0 12q6-3 0-12Z" fill="#7CF0FF" stroke="#136E82" stroke-width="1.5"/>`;
 const sparks=mk('g',{class:'fx',id:'sparks'},rig);
 sparks.innerHTML='<path class="sp" d="M40 40l4 10 10 4-10 4-4 10-4-10-10-4 10-4z" fill="#FFD84D"/><path class="sp" d="M168 30l3 8 8 3-8 3-3 8-3-8-8-3 8-3z" fill="#FF4D8D"/><path class="sp" d="M172 110l3 8 8 3-8 3-3 8-3-8-8-3 8-3z" fill="#4DE3FF"/>';

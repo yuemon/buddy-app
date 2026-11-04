@@ -181,7 +181,7 @@ body.holdcam #cmGo{min-height:96px;font-size:34px}
 #couch,#couchF,#zzz{display:none}
 #zzz text{font:800 34px "Barlow Condensed",sans-serif;fill:#4DE3FF;opacity:.85}
 #moodG{transform-box:fill-box;transform-origin:50% 100%;transition:transform .5s}
-#head{transform-box:fill-box;transform-origin:50% 90%;transition:transform .5s}
+.slot.home #head{transform-box:fill-box;transform-origin:50% 90%;transition:transform .5s}
 .slot.home .m-happy #moodG,.slot.home .m-fresh #moodG{animation:mBounce 1.1s ease-in-out infinite}
 .slot.home .m-happy #wrap:not(.flex) #rig>g[transform]>.armU,.slot.home .m-fresh #wrap:not(.flex) #rig>g[transform]>.armU,.slot.ward #wrap:not(.flex) #rig>g[transform]>.armU{animation:mWave 1.2s ease-in-out infinite}
 .slot.home .m-cheer #wrap:not(.flex) .armU{transform:rotate(150deg)}.slot.home .m-cheer #moodG{animation:mBounce .45s ease-in-out infinite}
@@ -269,3 +269,11 @@ body.app:has(#s-pick:not([hidden])){padding-bottom:0}
 #s-pick[data-n=s] .pGrid{grid-template-columns:repeat(4,minmax(0,1fr));gap:5px}
 #s-pick[data-n=s] .pIt{min-height:60px;border-radius:12px}#s-pick[data-n=s] .pIt .smI{width:32px;height:32px}#s-pick[data-n=s] .pIt span{font-size:12.5px}
 #s-pick[data-n=s] .pG h3{font-size:11.5px}
+/* Task G: while Buddy performs an exercise the head is posed by perf.js's transform attribute; keep CSS origin/transition off it */
+#perf #head{transform-box:view-box;transform-origin:0 0;transition:none}
+/* Task G: worked muscles glow + pulse during exercise animations, the rest are dimmed */
+#perf .ms.hot{filter:drop-shadow(0 0 4px #FFE34D) drop-shadow(0 0 10px #FF9F1C)!important;animation:gPulse 1s ease-in-out infinite}
+#perf .ms.hot .b{fill:#FFD23F;stroke:#B45309}
+#perf .ms:not(.hot){opacity:.3!important}
+@keyframes gPulse{50%{filter:drop-shadow(0 0 7px #FFF07A) drop-shadow(0 0 16px #FF7A1C)}}
+@media (prefers-reduced-motion:reduce){#perf .ms.hot{animation:none}}

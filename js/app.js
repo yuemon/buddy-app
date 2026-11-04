@@ -118,8 +118,8 @@ $('startBtn').onclick=()=>{const d=today(),G=GE(),f=e=>dayTot(e,d)/S.goals[e];co
 // ---------- 2. picker ----------
 const catOf=e=>(CATS.find(c=>c[1].includes(e))||['Other'])[0];
 let pRaf=0;
-function pAnim(){cancelAnimationFrame(pRaf);if(RM)return;try{Rig.wrap.classList.add('flip');Perf.enter(ex)}catch(e){return}const E=Perf.EXP[ex],t0=performance.now(),me=ex;
- const f=n=>{if(cur!=='pick'||ex!==me)return;try{Perf.draw(Perf.poseAt(E,((n-t0)/1000)/(E.dur||2)),Engine.D)}catch(e){}pRaf=requestAnimationFrame(f)};pRaf=requestAnimationFrame(f)}
+function pAnim(){cancelAnimationFrame(pRaf);if(window.__pStill)return;if(RM){try{Rig.wrap.classList.add('flip');Perf.enter(ex);const M=(Engine.EXMAP[ex]||{}).m||{};for(const k in M)Perf.setHeat(k,.35+.65*M[k]);Perf.draw(Perf.poseAt(Perf.EXP[ex],.5),Engine.D)}catch(e){}return}try{Rig.wrap.classList.add('flip');Perf.enter(ex)}catch(e){return}const E=Perf.EXP[ex],t0=performance.now(),me=ex,MM=(Engine.EXMAP[ex]||{}).m||{};
+ const f=n=>{if(cur!=='pick'||ex!==me)return;try{const pu=.8+.2*Math.sin((n-t0)/180);for(const k in MM)Perf.setHeat(k,Math.min(1,(.35+.65*MM[k])*pu));Perf.draw(Perf.poseAt(E,((n-t0)/1000)/(E.dur||2)),Engine.D)}catch(e){}pRaf=requestAnimationFrame(f)};pRaf=requestAnimationFrame(f)}
 function pStop(){cancelAnimationFrame(pRaf);pRaf=0;try{if(Perf.cur)Perf.leave()}catch(e){}}
 function renderPick(){$('pTitle').innerHTML=SM(ex,'smH')+EXN[ex];place('slotPick');
  {const V=VIS();if(!V.includes(ex))V.unshift(ex);const seen=new Set(),G=CATS.map(([n,l])=>[n,V.filter(e=>l.includes(e))]);G.forEach(g=>g[1].forEach(e=>seen.add(e)));const r=V.filter(e=>!seen.has(e));if(r.length)G.push(['Other',r]);

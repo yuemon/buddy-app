@@ -162,7 +162,7 @@ async function perform(id,sty,L){
    else{const u=easeSm(Math.min(1,(el-LEAD-total)/OUT));pose=Perf.poseAt(ex,0,S.ease).map((x,i)=>x+(idle[i]-x)*u);effort=1;if(el>LEAD+total+OUT)return res()}
    // effort heat on trained muscles
    const rep=live?(el<LEAD?-1:L.reps-1):el<LEAD?-1:Math.floor((el-LEAD)/dur),FX=!(live&&RM);
-   for(const k in E.m)Perf.setHeat(k,Math.min(1,Math.min(1,effort*1.3)*E.m[k]*(sty>=4?1:.8)+(sty===5?boost*E.m[k]:0)));
+   for(const k in E.m)Perf.setHeat(k,Math.min(1,.45*E.m[k]+Math.min(1,effort*1.3)*E.m[k]*(sty>=4?1:.8)+(sty===5?boost*E.m[k]:0)));
    const J=Perf.draw(pose,Engine.D);
    if(ex.timer)Perf.setTimer(live?Math.floor(L.hold)+'s':sty===5?'':el<LEAD?'0s':'HOLD '+Math.round(30*effort)+'s');
    const ox=Perf.cur.ox;
