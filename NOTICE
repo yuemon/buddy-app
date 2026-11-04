@@ -1,0 +1,3 @@
+Third-party components
+- mp/: MediaPipe Tasks Vision 0.10.14 and pose_landmarker_lite.task, (c) Google LLC, Apache License 2.0 (https://github.com/google-ai-edge/mediapipe).
+- fonts/: Barlow and Barlow Condensed by Jeremy Tribby, SIL Open Font License 1.1.
