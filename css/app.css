@@ -184,7 +184,7 @@ body.holdcam #cmGo{min-height:96px;font-size:34px}
 .slot.home #head{transform-box:fill-box;transform-origin:50% 90%;transition:transform .5s}
 .slot.home .m-happy #moodG,.slot.home .m-fresh #moodG{animation:mBounce 1.1s ease-in-out infinite}
 .slot.home .m-happy #wrap:not(.flex) #rig>g[transform]>.armU,.slot.home .m-fresh #wrap:not(.flex) #rig>g[transform]>.armU,.slot.ward #wrap:not(.flex) #rig>g[transform]>.armU{animation:mWave 1.2s ease-in-out infinite}
-.slot.home .m-cheer #wrap:not(.flex) .armU{transform:rotate(150deg)}.slot.home .m-cheer #moodG{animation:mBounce .45s ease-in-out infinite}
+.slot.home .m-cheer #wrap:not(.flex) .armU{transform:rotate(118deg)}.slot.home .m-cheer #wrap:not(.flex) .armF{transform:none!important}.slot.home .m-cheer #moodG{animation:mBounce .45s ease-in-out infinite}
 .slot.home .m-restless #moodG{animation:mSway 1.8s ease-in-out infinite}
 .slot.home .m-slump #moodG{transform:translateY(8px) scale(.96)}.slot.home .m-slump #head{transform:rotate(10deg)}
 .slot.home .m-sad #moodG{transform:translateY(16px) scale(.92)}.slot.home .m-sad #head{transform:rotate(16deg) translateY(6px)}
@@ -201,7 +201,7 @@ body.holdcam #cmGo{min-height:96px;font-size:34px}
 @keyframes vF{0%,100%{transform:rotate(0)}50%{transform:rotate(-28deg)}}
 @keyframes vNod{0%,100%{transform:rotate(0)}50%{transform:rotate(-6deg)}}
 @keyframes vSq{0%,100%{transform:translateY(0) scale(1.03,.97)}50%{transform:translateY(-10px) scale(.98,1.02)}}
-@keyframes vJ{0%,100%{transform:translateY(0) scale(1.08,.9)}35%{transform:translateY(-16px) scale(.95,1.06)}65%{transform:translateY(0) scale(1.1,.88)}80%{transform:translateY(0) scale(1,1)}}
+@keyframes vJ{0%,100%{transform:translateY(0) scale(1.06,.93)}35%{transform:translateY(-8px) scale(.96,1.04)}65%{transform:translateY(0) scale(1.1,.88)}80%{transform:translateY(0) scale(1,1)}}
 @keyframes vDrop{0%{transform:translateY(-4px);opacity:0}20%{opacity:1}100%{transform:translateY(16px);opacity:0}}
 @keyframes vTap{0%,100%{transform:rotate(0)}50%{transform:rotate(-12deg)}}
 @keyframes vSi{0%,100%{transform:translateY(8px) scale(.96)}50%{transform:translateY(12px) scale(.95,.93)}}
