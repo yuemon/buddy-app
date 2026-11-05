@@ -310,3 +310,5 @@ body.app:has(#s-pick:not([hidden])){padding-bottom:0}
 #perf .ms:not(.hot){opacity:.3!important}
 @keyframes gPulse{50%{filter:drop-shadow(0 0 7px #FFF07A) drop-shadow(0 0 16px #FF7A1C)}}
 @media (prefers-reduced-motion:reduce){#perf .ms.hot{animation:none}}
+/* chair prop (chair dips) */
+#perf .chair rect{fill:#2A2016;stroke:#FFB070;stroke-width:2}

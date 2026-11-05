@@ -25,5 +25,9 @@ const ICONS={
  ,chinups:'<path d="M5 6H43" stroke-width="2.6"/><circle cx="24" cy="10" r="3.5"/><path d="M24 15V29L20 39M24 29L28 38M24 17L17 15L19 7M24 17L31 15L29 7"/>'
  ,scappulls:'<path d="M5 6H43" stroke-width="2.6"/><circle cx="24" cy="14" r="3.5"/><path d="M24 19V32L21 43M24 32L27 43M24 20L18 7M24 20L30 7M10 24V16M7 19L10 16L13 19"/>'
  ,legraises:'<path d="M5 6H43" stroke-width="2.6"/><circle cx="20" cy="15" r="3.5"/><path d="M20 20V32L44 30M20 22L18 7M20 22L26 7"/>'
+ ,dips:'<path d="M4 25H17M6 25V41M15 25V41M5 25V10" stroke-width="2.2"/><circle cx="21" cy="9" r="3.5"/><path d="M21 14L20 29L33 30L36 40M21 16L14 21L13 25"/><path class="fl" d="M2 41.5H44"/>'
+ ,crunches:'<circle cx="11" cy="28" r="3.5"/><path d="M15 31L27 38L35 28L42 39M16 32L20 25"/><path class="fl" d="M3 41.5H46"/>'
+ ,revlunges:'<circle cx="24" cy="8" r="3.5"/><path d="M24 13V26L35 27V40M24 26L15 36L5 39M24 17L20 26"/><path class="fl" d="M2 41.5H44"/><path d="M11 20H3M6 17L3 20L6 23" stroke-width="2"/>'
+ ,lyinglegs:'<circle cx="7" cy="36" r="3.5"/><path d="M12 38H26L34 10M12 38L22 37"/><path class="fl" d="M2 41.5H46"/>'
 };
 const iconSvg=id=>`<svg class="ico" viewBox="0 0 48 48" aria-hidden="true" focusable="false">${ICONS[id]}</svg>`;

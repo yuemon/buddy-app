@@ -108,6 +108,20 @@ var CFG={
   what:'each knee lifting (each step counts 1)',tip:'Phone ~2.5 m away, facing you, hips and knees in view. Lift each knee a little.',sigs:[Object.assign({},kl,{prior:.45})]};
  CFG.stepjacks={name:'Step Jacks',kind:'rep',unit:'reps',rel:'high',hi:.7,lo:.3,period:.5,count:'peak',steady:.15,minCut:2.5,beta:1,
   what:'hands going overhead (feet step out, no jump)',tip:'Phone ~2.5 m away, room to spread your arms.',sigs:[CFG.jacks.sigs[1]]};
+CFG.dips={name:'Chair Dips',kind:'rep',unit:'reps',rel:'medium',hi:.65,lo:.3,period:.8,count:'return',steady:.12,minCut:1.4,
+  what:'shoulders dropping (side view), head or hips as backup',
+  tip:'Phone ~2 m to your side, whole body in view. Hands on the edge of a sturdy chair behind you, feet forward; bend your elbows to lower your hips, then push back up.',
+  sigs:[G.sh(.45,1),G.head(.45,1),G.hip(.45,1)]};
+CFG.crunches=X('situps',{name:'Crunches',rel:'medium',period:.7,
+  what:'head and shoulders lifting off the floor (small range)',
+  tip:'Phone on the floor beside you, head and shoulders in view. Knees bent, feet flat; curl your shoulders up off the floor, lower back stays down.',
+  sigs:[G.head(.4,-1),G.sh(.3,-1)]});
+CFG.revlunges=X('lunges',{name:'Reverse Lunges',tip:'Phone ~2 m away, facing you or from the side, whole body in view. Step one foot back and drop the back knee toward the floor; alternate legs.'});
+CFG.lyinglegs={name:'Lying Leg Raises',kind:'rep',unit:'reps',rel:'medium',hi:.65,lo:.3,period:1,count:'peak',steady:.12,minCut:1.2,
+  what:'feet rising, knees as backup',
+  tip:'Phone on the floor ~2 m to your side, hips and feet in view. Lie flat, legs straight; lift them to vertical and lower slowly without touching down.',
+  sigs:[{n:'feet rising',need:['hip','ankle'],dir:-1,prior:1,hl:['la','ra'],v:function(F){return F.mid('la','ra')[1]}},
+   {n:'knees rising',need:['hip','knee'],dir:-1,prior:.5,hl:['lk','rk'],v:function(F){return F.mid('lk','rk')[1]}}]};
 })();
 Object.keys(CFG).forEach(function(k){var c=CFG[k];c.need=(c.sigs||c.conds)[0].need.reduce(function(a,g){return a.concat(GROUPS[g])},[])});
 

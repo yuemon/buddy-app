@@ -104,6 +104,20 @@ EXP.scappulls={dur:2.2,reps:3,bar:22,hk:1,gen:scGen,prog:u=>hangPose({tor:182,rx
 const lrPose=u=>{const hip=-3+93*u;return hangPose({tor:183+5*u,rx:28,h:67,hdo:-3,L:[hip,hip],M:[hip+3,hip+3],ft:hip+85,ft2:hip+88})};
 const lrGen=p=>lrPose(krU(p));
 EXP.legraises={dur:KR.tot,reps:3,bar:22,hk:1,gen:lrGen,prog:lrPose,keys:[lrGen(0),lrGen(.4)]};
+// chair dips: hands on a chair seat behind, feet forward on the floor; elbows bend, hips drop straight down
+const dp=d=>Pz({tor:182,hd:184,A:{ikh:[-16,-4-d]},B:{ikh:[-13,-4-d]},L:{ik:[64,60-d]},M:{ik:[60,60-d]},ft:80,ft2:80});
+EXP.dips={dur:1.5,reps:3,chair:1,keys:[dp(0),dp(30)]};
+// crunches: lying, knees bent, shoulders curl a little off the floor
+// hands folded on the chest (explicit angles so the interpolation never swings the arm through the floor)
+const crP=(tor,hd)=>Pz({tor,hd,A:[tor-160,tor-5],B:[tor-157,tor-2],L:{ik:[56,4]},M:{ik:[58,4]}});
+EXP.crunches={dur:1.2,reps:3,lie:1,hk:1,keys:[crP(270,250),crP(240,226)]};
+// reverse lunges: one foot steps BACK, hips sink, alternate legs
+const rl=(near)=>Pz({hx:-18,tor:178,A:{ikh:[10,-3]},B:{ikh:[10,-3]},L:near?{ik:[-50,46]}:{ik:[44,52]},M:near?{ik:[44,52]}:{ik:[-50,46]},ft:near?20:90,ft2:near?90:20});
+const rs=()=>stand({A:{ikh:[10,-3]},B:{ikh:[10,-3]}});
+EXP.revlunges={dur:2.6,reps:2,keys:[rs(),rl(true),rs(),rl(false)]};
+// lying leg raises: flat on the back, straight legs lift to vertical and lower
+const ll=a=>Pz({tor:270,hd:250,A:[92,92],B:[96,96],L:[90+a,90+a],M:[92+a,92+a],ft:180+a,ft2:182+a});
+EXP.lyinglegs={dur:2.2,reps:3,lie:1,hk:1,keys:[ll(-4),ll(84)]};
 // ---- forward kinematics
 const add=(a,b)=>[a[0]+b[0],a[1]+b[1]],sc=(a,k)=>[a[0]*k,a[1]*k];
 function fk(v,ex){
@@ -136,7 +150,7 @@ const eSmooth=f=>.5-.5*Math.cos(Math.PI*f);
 function livePose(id,u,aux){const ex=EXP[id];aux=aux||{};u=u<0?0:u>1?1:u;const k=ex.keys;
  if(ex.prog)return ex.prog(u);
  if(id==='deadhang'||id==='plank')return poseAt(ex,((aux.t||0)/ex.dur)%1,e=>e);
- if(id==='lunges'){const s=(aux.rep||0)%2?2:0;return lerpV(k[s],k[s+1],u)}
+ if(id==='lunges'||id==='revlunges'){const s=(aux.rep||0)%2?2:0;return lerpV(k[s],k[s+1],u)}
  if(id==='climbers')return lerpV(k[0],k[1],u);
  if(id==='burpees'){const p=(aux.dir<0?1-.5*u:.5*u);return poseAt(ex,p>=1?.9999:p,e=>e)}
  return lerpV(k[0],k[1],u)}
@@ -145,6 +159,7 @@ function poseAt(ex,phase,ease=eSmooth){if(ex.gen)return ex.gen(((phase%1)+1)%1);
 const perf=document.getElementById('perf');
 const stickP=(cls,p)=>{const g=mk('g',{class:cls},p);const o=mk('path',{class:'o'},g),f=mk('path',{class:'f'},g);return {g,set(d){o.setAttribute('d',d);f.setAttribute('d',d)}}};
 const wall=mk('rect',{class:'wall',x:0,y:30,width:16,height:250,rx:3},perf);
+const chairG=mk('g',{class:'chair'},perf),chSeat=mk('rect',{rx:3,height:9,width:58},chairG),chBack=mk('rect',{rx:3,width:9},chairG),chL1=mk('rect',{width:7},chairG),chL2=mk('rect',{width:7},chairG);chairG.style.display='none';
 const floorLine=mk('line',{class:'floor',x1:-90,x2:290,y1:GY+2,y2:GY+2},perf);
 const barG=mk('g',{class:'pbar'},perf);
 const barPost=[mk('rect',{class:'post',x:-72,width:13,rx:3},barG),mk('rect',{class:'post',x:259,width:13,rx:3},barG)];
@@ -208,6 +223,8 @@ function draw(v,D){
   barPost.forEach(p=>{p.setAttribute('y',by-4);p.setAttribute('height',GY+2-(by-4))});barRod.setAttribute('y',by-5);barHi.setAttribute('y1',by-2);barHi.setAttribute('y2',by-2);
   barCapL.setAttribute('y',by-11);barCapR.setAttribute('y',by-11);tmr.setAttribute('y',by+38);tmr.style.display=ex.timer?'':'none'}
  else barG.style.display='none';
+ // chair prop (dips): seat top just under the near hand
+ if(ex.chair){chairG.style.display='';const sx=J.wN[0]+ox+5,sy=J.wN[1]+8;chSeat.setAttribute('x',sx-58);chSeat.setAttribute('y',sy);chBack.setAttribute('x',sx-58);chBack.setAttribute('y',sy-78);chBack.setAttribute('height',80);chL1.setAttribute('x',sx-56);chL2.setAttribute('x',sx-9);for(const l of [chL1,chL2]){l.setAttribute('y',sy+8);l.setAttribute('height',Math.max(0,GY+2-sy-8))}}else chairG.style.display='none';
  // wall prop
  wall.style.display=ex.wall!=null||ex.wallX!=null?'':'none';if(ex.wallX!=null)wall.setAttribute('x',ex.wallX+ox);else if(ex.wall!=null){wall.setAttribute('x',J.hN[0]+ox+ex.wall-16)}
  // side-profile muscles (bone-local shapes, morph flat->pumped, flare when worked)

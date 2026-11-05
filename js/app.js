@@ -15,9 +15,11 @@ const XT={pushups:['Push-ups','push-ups','rep',50,'#C6FF3D','💪'],squats:['Squ
  climbers:['Mountain climbers','mountain climbers','rep',0,'#FFA35C','⛰'],highknees:['High knees','high knees','rep',0,'#FF7AE0','🏃'],
  march:['Marching','marching steps','rep',0,'#A0C4FF','🚶'],stepjacks:['Step jacks','step jacks','rep',0,'#D4B8FF','⭐'],
  chinups:['Chin-ups','chin-ups','rep',0,'#FFB870','🧗'],scappulls:['Scapular pulls','scapular pulls','rep',0,'#FFD9A0','🙌'],
- kneeraises:['Hanging knee raises','knee raises','rep',0,'#FFE066','🦵'],legraises:['Hanging leg raises','leg raises','rep',0,'#F5C542','🦵']};
+ kneeraises:['Hanging knee raises','knee raises','rep',0,'#FFE066','🦵'],legraises:['Hanging leg raises','leg raises','rep',0,'#F5C542','🦵'],
+ dips:['Chair dips','chair dips','rep',0,'#FFA8A8','🪑'],crunches:['Crunches','crunches','rep',0,'#FFE38A','🔥'],
+ revlunges:['Reverse lunges','reverse lunges','rep',0,'#7DFFD0','🚶'],lyinglegs:['Lying leg raises','lying leg raises','rep',0,'#FFD27A','🦵']};
 // categories for Settings › Choose exercises (each exercise lives in one group)
-const CATS=[['Upper body',['pushups','kneepush']],['Lower body',['squats','lunges','calves','glutes','wallsit']],['Core',['situps','plank','sideplank','superman','birddog']],
+const CATS=[['Upper body',['pushups','kneepush','dips']],['Lower body',['squats','lunges','calves','glutes','wallsit','revlunges']],['Core',['situps','plank','sideplank','superman','birddog','crunches','lyinglegs']],
  ['Cardio',['jacks','burpees','climbers','highknees']],['Pull-up bar',['pullups','chinups','deadhang','scappulls','kneeraises','legraises']],['Beginner / low-impact',['wallpush','sitstand','march','stepjacks']]];
 const VIS0=['pushups','squats','situps','pullups','jacks','burpees','lunges','calves','plank','deadhang'];
 // camera counting is offered only where the pose counter has a config for it (others are manual / voice-timer only)
@@ -336,8 +338,8 @@ function iosHint(){const ios=/iP(hone|ad|od)/.test(navigator.userAgent),sa=navig
 if('serviceWorker' in navigator&&location.protocol!=='file:'){navigator.serviceWorker.register('sw.js').then(()=>navigator.serviceWorker.ready).then(r=>{r.active&&r.active.postMessage('warm');setTimeout(checkOffline,4000)}).catch(()=>{})}
 async function checkOffline(){try{const c=await caches.open('buddy-mp-0.10.14');const ks=await c.keys();window.__offlineReady=ks.length>=6;if(ks.length<6)setTimeout(checkOffline,5000)}catch(e){}}
 // ---------- Buddy motivation: mood, tips, muscle levels, XP + outfits (all computed from local sets; small "seen" state in S.mot) ----------
-const XPR={pushups:1,squats:.8,situps:.7,pullups:3,jacks:.3,burpees:2.5,lunges:.9,calves:.3,plank:.5,deadhang:.5,kneepush:.7,wallpush:.4,sitstand:.6,glutes:.6,wallsit:.5,sideplank:.6,superman:.6,birddog:.6,climbers:.35,highknees:.3,march:.15,stepjacks:.25,chinups:3,scappulls:1,kneeraises:1.5,legraises:2.5}; // per rep, or per second for holds
-const SECR={pushups:2.5,squats:2.5,situps:2.5,pullups:3.5,jacks:1,burpees:4,lunges:3,calves:1.5,plank:1,deadhang:1,kneepush:2.5,wallpush:2.5,sitstand:3,glutes:2.5,wallsit:1,sideplank:1,superman:3,birddog:3,climbers:1,highknees:1,march:1,stepjacks:1.5,chinups:3.5,scappulls:2.5,kneeraises:3,legraises:3.5}; // ~seconds per rep (activity minutes)
+const XPR={pushups:1,squats:.8,situps:.7,pullups:3,jacks:.3,burpees:2.5,lunges:.9,calves:.3,plank:.5,deadhang:.5,kneepush:.7,wallpush:.4,sitstand:.6,glutes:.6,wallsit:.5,sideplank:.6,superman:.6,birddog:.6,climbers:.35,highknees:.3,march:.15,stepjacks:.25,chinups:3,scappulls:1,kneeraises:1.5,legraises:2.5,dips:1,crunches:.5,revlunges:.9,lyinglegs:.7}; // per rep, or per second for holds
+const SECR={pushups:2.5,squats:2.5,situps:2.5,pullups:3.5,jacks:1,burpees:4,lunges:3,calves:1.5,plank:1,deadhang:1,kneepush:2.5,wallpush:2.5,sitstand:3,glutes:2.5,wallsit:1,sideplank:1,superman:3,birddog:3,climbers:1,highknees:1,march:1,stepjacks:1.5,chinups:3.5,scappulls:2.5,kneeraises:3,legraises:3.5,dips:2.5,crunches:2,revlunges:3,lyinglegs:2.5}; // ~seconds per rep (activity minutes)
 const SET_XP=5,xpNeed=n=>50*n*(n-1); // total XP to reach level n: L2 100, L3 300, L4 600, L5 1000 ...
 const OUTFITS=[['wrist','Wristbands',2,'wrist'],['shades','Sunglasses',3,'eyes'],['shorts','Blue shorts',4,'legs'],['gold','Gold headband',5,'band'],['gloves','Boxing gloves',6,'hands'],['redshorts','Red shorts',7,'legs'],['cape','Hero cape',8,'back'],['crown','Crown',10,'top']];
 const MGROUP={legs:['quads','glutes','hams','calves'],core:['abs','obliques'],'upper body':['chest','triceps','delts'],back:['lats','biceps','forearms']};
