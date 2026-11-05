@@ -384,11 +384,13 @@ function ensureMoodLayer(){if(moodNode||typeof Rig==='undefined')return;const w=
  moodNode=document.createElementNS(ns,'g');moodNode.id='moodG';w.parentNode.insertBefore(moodNode,w);moodNode.appendChild(w);
  const couch=document.createElementNS(ns,'g');couch.id='couch';couch.innerHTML='<path d="M-10 182H210V246H-10Z" fill="#2A3442" stroke="#4DE3FF" stroke-width="3" stroke-opacity=".5" stroke-linejoin="round"/>';
  moodNode.parentNode.insertBefore(couch,moodNode);
+ const pil=document.createElementNS(ns,'g');pil.id='pillow';pil.innerHTML='<rect x="4" y="200" width="44" height="28" rx="15" fill="#5A6B80" stroke="#4DE3FF" stroke-width="2.5" stroke-opacity=".55"/>';couch.appendChild(pil);
  const front=document.createElementNS(ns,'g');front.id='couchF';front.innerHTML='<path d="M-22 230H222V270H-22Z" fill="#334050" stroke="#4DE3FF" stroke-width="3" stroke-opacity=".6" stroke-linejoin="round"/><path d="M-30 196H0V276H-30ZM200 196H230V276H200Z" fill="#3B4A5C" stroke="#4DE3FF" stroke-width="3" stroke-opacity=".6" stroke-linejoin="round"/><path d="M-26 276V286M226 276V286" stroke="#4DE3FF" stroke-width="4" stroke-opacity=".5" stroke-linecap="round"/>';
  moodNode.parentNode.insertBefore(front,moodNode.nextSibling);
  const z=document.createElementNS(ns,'g');z.id='zzz';z.innerHTML='<text x="140" y="60">z</text><text x="162" y="36">z</text><text x="186" y="12">Z</text>';moodNode.parentNode.appendChild(z);
+ const tr=document.createElementNS(ns,'g');tr.id='tear';tr.innerHTML='<path d="M84 70q-5 8 0 10q5-2 0-10Z" fill="#7CF0FF" stroke="#136E82" stroke-width="1.5"/>';Rig.face.appendChild(tr);
  const f=document.createElementNS(ns,'g');f.setAttribute('data-f','ez');f.setAttribute('class','fx');f.innerHTML='<path d="M80 63Q87 68 94 63M106 63Q113 68 120 63" fill="none" stroke="#1B2A06" stroke-width="4" stroke-linecap="round"/>';Rig.face.appendChild(f)}
-const FACE={fresh:['eo','mhappy','cheek'],happy:['eh','mhappy','cheek'],ready:['eo','mok'],restless:['eo','mok','sweat'],slump:['eo','msad'],sad:['eo','msad'],nap:['ez','mok'],cheer:['eh','mhappy','cheek']};
+const FACE={fresh:['eo','mhappy'],happy:['eh','mhappy'],ready:['eo','mok'],restless:['eo','mok','sweat'],slump:['es','msad'],sad:['eo','msad'],nap:['ez','mok'],cheer:['eh','mhappy']};
 function setMood(m){const st=document.querySelector('.stage');st.classList.remove(...['fresh','happy','ready','restless','slump','sad','nap','cheer'].map(x=>'m-'+x));st.classList.add('m-'+m);st.dataset.mood=m;try{Rig.setF(FACE[m])}catch(e){}}
 function motHome(){ensureMoodLayer();drawOutfit();let [m,cap]=mood();
  if(justLogged&&m==='happy'){justLogged=false;setMood('cheer');$('moodCap').textContent='Yes! That set made me stronger! 🎉';try{BV2.flex(1600)}catch(e){}setTimeout(()=>{if(cur==='home')setMood('happy'),$('moodCap').textContent=cap},2600)}
